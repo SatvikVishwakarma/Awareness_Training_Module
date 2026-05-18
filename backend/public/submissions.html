@@ -1,0 +1,706 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Admin Dashboard</title>
+  <style>
+    :root {
+      --bg: #0b1020;
+      --card: #ffffff;
+      --text: #0f172a;
+      --muted: #64748b;
+      --primary: #1d4ed8;
+      --primary-dark: #1e40af;
+      --danger: #b91c1c;
+      --danger-dark: #991b1b;
+      --success: #15803d;
+      --border: #dbe3ef;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      color: var(--text);
+      background: radial-gradient(circle at top right, #dbeafe, transparent 42%), linear-gradient(135deg, #eef2ff 0%, #f8fafc 35%, #ecfeff 100%);
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1250px;
+      margin: 0 auto;
+      display: grid;
+      gap: 16px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+      padding: 18px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 16px;
+    }
+
+    .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .input, textarea, select {
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      min-width: 230px;
+      width: 100%;
+    }
+
+    .button {
+      border: 0;
+      border-radius: 8px;
+      padding: 10px 14px;
+      background: var(--primary);
+      color: #fff;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    .button:hover { background: var(--primary-dark); }
+
+    .button.secondary {
+      background: #334155;
+    }
+
+    .button.danger {
+      background: var(--danger);
+    }
+
+    .button.danger:hover {
+      background: var(--danger-dark);
+    }
+
+    .status {
+      font-size: 14px;
+      color: var(--muted);
+    }
+
+    .modules {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 10px;
+    }
+
+    .module-item {
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      min-height: 54px;
+    }
+
+    .switch {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+
+    th, td {
+      border-bottom: 1px solid #e2e8f0;
+      text-align: left;
+      padding: 10px 8px;
+      vertical-align: top;
+      word-break: break-word;
+    }
+
+    th {
+      background: #f8fafc;
+      font-weight: 700;
+      position: sticky;
+      top: 0;
+    }
+
+    .table-wrap {
+      max-height: 520px;
+      overflow: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+    }
+
+    .hidden { display: none; }
+
+    .records-tools {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .input.compact {
+      min-width: 200px;
+      width: 200px;
+      padding: 9px 10px;
+    }
+
+    .records-area {
+      margin-top: 10px;
+    }
+
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card" id="loginCard">
+      <h1>Training Admin Dashboard</h1>
+      <p class="muted">Use your admin password to manage module availability, lock/unlock the portal, and monitor employee records.</p>
+      <div class="row">
+        <input id="password" class="input" type="password" placeholder="Admin password" autocomplete="current-password">
+        <button id="loginButton" class="button" type="button">Sign In</button>
+      </div>
+      <div id="loginStatus" class="status"></div>
+    </div>
+
+    <div id="app" class="hidden">
+      <div class="card">
+        <div class="row" style="justify-content: space-between;">
+          <div>
+            <h1>Admin Controls</h1>
+            
+          </div>
+          <div class="row">
+            <button id="refreshAll" class="button secondary" type="button">Refresh Data</button>
+            <button id="logoutButton" class="button danger" type="button">Sign Out</button>
+          </div>
+        </div>
+        <div id="appStatus" class="status" style="margin-top: 8px;"></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <h2 style="margin:0 0 10px 0;">Module Availability</h2>
+          <div id="moduleList" class="modules"></div>
+          <div style="margin-top: 14px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            <h3 style="margin:0 0 8px 0; font-size: 16px;">Register Packaged Module</h3>
+            <div class="row">
+              <input id="moduleIdInput" class="input" type="text" placeholder="Module ID (example: cloud-security)">
+              <input id="moduleTitleInput" class="input" type="text" placeholder="Module Title">
+              <input id="modulePathInput" class="input" type="text" placeholder="Entry Path (example: cloud-security-training/module.html)">
+              <button id="registerModuleButton" class="button" type="button">Register Module</button>
+            </div>
+            <p class="muted" style="margin:8px 0 0 0;">Admin registers an existing packaged HTML module path. Raw HTML paste/upload is not supported.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2 style="margin:0 0 10px 0;">Portal Lock</h2>
+          <div class="row" style="align-items: flex-start;">
+            <label class="switch">
+              <input id="lockToggle" type="checkbox">
+              Lock Training Portal
+            </label>
+          </div>
+          <label for="lockReason" class="muted">Lock Message</label>
+          <textarea id="lockReason" rows="4" placeholder="Training portal is temporarily unavailable."></textarea>
+          <div class="row" style="margin-top: 10px;">
+            <button id="saveLock" class="button" type="button">Save Lock Settings</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" id="recordsCard">
+        <div class="row" style="justify-content: space-between;">
+          <h2 style="margin:0;">Employee Records</h2>
+          <div class="records-tools">
+            <label class="switch">
+              <input id="autoRefresh" type="checkbox" checked>
+              Auto Refresh (30s)
+            </label>
+            <button id="loadButton" class="button secondary" type="button">Refresh Now</button>
+            <button id="printButton" class="button" type="button">Print Records</button>
+            <input id="clearPassword" class="input compact" type="password" placeholder="Admin password" autocomplete="current-password">
+            <button id="clearButton" class="button danger" type="button">Clear Records</button>
+          </div>
+        </div>
+
+        <div id="recordsStatus" class="status" style="margin: 10px 0;"></div>
+
+        <div id="recordsArea" class="records-area">
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Department</th>
+                <th>Email</th>
+                <th>IP Address</th>
+                <th>Submitted At</th>
+              </tr>
+            </thead>
+            <tbody id="rows"></tbody>
+          </table>
+        </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentModules = [];
+    let moduleLabelLookup = {};
+    let csrfToken = '';
+    let autoRefreshInterval = null;
+
+    function getAuthHeaders() {
+      return csrfToken ? { 'x-csrf-token': csrfToken } : {};
+    }
+
+    async function adminFetch(url, options = {}) {
+      const headers = {
+        ...(options.headers || {}),
+        ...getAuthHeaders()
+      };
+
+      const response = await fetch(url, {
+        ...options,
+        credentials: 'same-origin',
+        headers
+      });
+
+      const payload = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        if (response.status === 401) {
+          logout(false);
+        }
+        throw new Error(payload.error || 'Request failed');
+      }
+
+      return payload;
+    }
+
+    function setStatus(id, message) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = message;
+      }
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function renderModules(modules, moduleAvailability) {
+      const list = document.getElementById('moduleList');
+      list.innerHTML = modules.map((module) => {
+        const moduleId = module.id;
+        const enabled = moduleAvailability[moduleId] !== false;
+        return `
+          <div class="module-item">
+            <div>${escapeHtml(module.title)}</div>
+            <label class="switch">
+              <input type="checkbox" data-module-id="${moduleId}" ${enabled ? 'checked' : ''}>
+              ${enabled ? 'Enabled' : 'Disabled'}
+            </label>
+          </div>
+        `;
+      }).join('');
+
+      list.querySelectorAll('input[type="checkbox"][data-module-id]').forEach((checkbox) => {
+        checkbox.addEventListener('change', async (event) => {
+          const moduleId = event.target.getAttribute('data-module-id');
+          const enabled = event.target.checked;
+          try {
+            await adminFetch(`/api/v1/admin/settings/module/${encodeURIComponent(moduleId)}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ enabled })
+            });
+            await loadSettings();
+            const moduleLabel = moduleLabelLookup[moduleId] || moduleId;
+            setStatus('appStatus', `Updated module setting: ${moduleLabel} => ${enabled ? 'Enabled' : 'Disabled'}`);
+          } catch (error) {
+            event.target.checked = !enabled;
+            setStatus('appStatus', `Error: ${error.message}`);
+          }
+        });
+      });
+    }
+
+    async function loadSettings() {
+      const payload = await adminFetch('/api/v1/admin/settings');
+      const modules = Array.isArray(payload.modules) ? payload.modules : [];
+      const moduleAvailability = payload.moduleAvailability || {};
+      const siteLock = payload.siteLock || { locked: false, reason: '' };
+
+      currentModules = modules;
+      moduleLabelLookup = modules.reduce((acc, module) => {
+        acc[module.id] = module.title;
+        return acc;
+      }, {});
+
+      renderModules(modules, moduleAvailability);
+      document.getElementById('lockToggle').checked = Boolean(siteLock.locked);
+      document.getElementById('lockReason').value = siteLock.reason || '';
+    }
+
+    async function registerModule() {
+      const idInput = document.getElementById('moduleIdInput');
+      const titleInput = document.getElementById('moduleTitleInput');
+      const pathInput = document.getElementById('modulePathInput');
+
+      const id = (idInput.value || '').trim().toLowerCase();
+      const title = (titleInput.value || '').trim();
+      const entryPath = (pathInput.value || '').trim();
+
+      if (!id || !title || !entryPath) {
+        setStatus('appStatus', 'Module id, title, and entry path are required.');
+        return;
+      }
+
+      if (currentModules.some((module) => module.id === id)) {
+        setStatus('appStatus', 'A module with this id already exists.');
+        return;
+      }
+
+      await adminFetch('/api/v1/admin/modules', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, title, entryPath })
+      });
+
+      idInput.value = '';
+      titleInput.value = '';
+      pathInput.value = '';
+
+      await loadSettings();
+      setStatus('appStatus', `Module registered: ${title}`);
+    }
+
+    async function loadSubmissions() {
+      const rowsEl = document.getElementById('rows');
+      setStatus('recordsStatus', 'Loading employee records...');
+      rowsEl.innerHTML = '';
+
+      const payload = await adminFetch('/api/v1/employee-details?page=1&pageSize=500');
+      const items = payload.items || [];
+
+      if (items.length === 0) {
+        setStatus('recordsStatus', 'No records found.');
+        return;
+      }
+
+      setStatus('recordsStatus', `Loaded ${items.length} of ${payload.total} records. Last refresh: ${new Date().toLocaleTimeString()}`);
+      rowsEl.innerHTML = items.map((item) => `
+        <tr>
+          <td>${escapeHtml(item.name)}</td>
+          <td>${escapeHtml(item.department)}</td>
+          <td>${escapeHtml(item.email)}</td>
+          <td>${escapeHtml(item.ip_address)}</td>
+          <td>${escapeHtml(new Date(item.timestamp).toLocaleString())}</td>
+        </tr>
+      `).join('');
+    }
+
+    async function saveLockSettings() {
+      const locked = document.getElementById('lockToggle').checked;
+      const reason = (document.getElementById('lockReason').value || '').trim();
+      await adminFetch('/api/v1/admin/settings/site-lock', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ locked, reason })
+      });
+      setStatus('appStatus', `Portal is now ${locked ? 'LOCKED' : 'UNLOCKED'}.`);
+    }
+
+    function setupAutoRefresh() {
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+      }
+
+      const enabled = document.getElementById('autoRefresh').checked;
+      if (!enabled) {
+        return;
+      }
+
+      autoRefreshInterval = setInterval(() => {
+        loadSubmissions().catch((error) => {
+          setStatus('recordsStatus', `Error: ${error.message}`);
+        });
+      }, 30000);
+    }
+
+    function printRecordsOnly() {
+      const recordsArea = document.getElementById('recordsArea');
+      if (!recordsArea) {
+        setStatus('recordsStatus', 'Error: Could not find records section to print.');
+        return;
+      }
+
+      const rowsCount = document.querySelectorAll('#rows tr').length;
+      if (rowsCount === 0) {
+        setStatus('recordsStatus', 'No records to print.');
+        return;
+      }
+
+      const printFrame = document.createElement('iframe');
+      printFrame.setAttribute('aria-hidden', 'true');
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = '0';
+      printFrame.style.opacity = '0';
+      document.body.appendChild(printFrame);
+
+      const doc = printFrame.contentDocument || (printFrame.contentWindow && printFrame.contentWindow.document);
+      if (!doc) {
+        printFrame.remove();
+        setStatus('recordsStatus', 'Error: Unable to generate printable view.');
+        return;
+      }
+
+      const printableTable = recordsArea.innerHTML;
+      const generatedAt = new Date().toLocaleString();
+      const printHtml = `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Employee Records</title>
+  <style>
+    body { font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif; margin: 24px; color: #0f172a; }
+    h1 { margin: 0 0 8px 0; font-size: 24px; }
+    .meta { margin: 0 0 14px 0; color: #475569; font-size: 13px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { border: 1px solid #cbd5e1; text-align: left; padding: 8px; vertical-align: top; }
+    th { background: #f8fafc; font-weight: 700; }
+    .table-wrap { max-height: none; overflow: visible; border: none; border-radius: 0; }
+    @page { margin: 14mm; }
+  </style>
+</head>
+<body>
+  <h1>Employee Records</h1>
+  <p class="meta">Generated at: ${escapeHtml(generatedAt)}</p>
+  ${printableTable}
+</body>
+</html>`;
+
+      doc.open();
+      doc.write(printHtml);
+      doc.close();
+
+      setTimeout(() => {
+        try {
+          if (printFrame.contentWindow) {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+          }
+        } catch (_error) {
+          setStatus('recordsStatus', 'Error: Printing was blocked by your browser.');
+        } finally {
+          setTimeout(() => {
+            if (printFrame && printFrame.parentNode) {
+              printFrame.parentNode.removeChild(printFrame);
+            }
+          }, 1000);
+        }
+      }, 200);
+    }
+
+    async function clearRecords() {
+      const passwordInput = document.getElementById('clearPassword');
+      const password = (passwordInput.value || '').trim();
+      if (!password) {
+        setStatus('recordsStatus', 'Enter admin password to clear records.');
+        return;
+      }
+
+      const confirmed = window.confirm('This will permanently delete all employee records. Continue?');
+      if (!confirmed) {
+        return;
+      }
+
+      try {
+        const payload = await adminFetch('/api/v1/admin/employee-details', {
+          method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+
+        passwordInput.value = '';
+        setStatus('recordsStatus', `${payload.message}. Deleted ${payload.deletedCount} records.`);
+        await loadSubmissions();
+      } catch (error) {
+        setStatus('recordsStatus', `Error: ${error.message}`);
+      }
+    }
+
+    async function login() {
+      const password = (document.getElementById('password').value || '').trim();
+      if (!password) {
+        setStatus('loginStatus', 'Enter your admin password.');
+        return;
+      }
+
+      setStatus('loginStatus', 'Signing in...');
+
+      try {
+        const response = await fetch('/api/v1/admin/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ password })
+        });
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || 'Login failed');
+        }
+
+        csrfToken = String(payload.csrfToken || '');
+        if (!csrfToken) {
+          throw new Error('Invalid login response');
+        }
+
+        setStatus('loginStatus', 'Signed in.');
+        await initializeApp();
+      } catch (error) {
+        setStatus('loginStatus', `Error: ${error.message}`);
+      }
+    }
+
+    async function initializeApp() {
+      document.getElementById('loginCard').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+      await loadSettings();
+      await loadSubmissions();
+      setupAutoRefresh();
+    }
+
+    async function logout(callApi = true) {
+      if (callApi) {
+        try {
+          await adminFetch('/api/v1/admin/logout', { method: 'POST' });
+        } catch (_error) {
+          // Ignore logout API failures.
+        }
+      }
+
+      csrfToken = '';
+      if (autoRefreshInterval) {
+        clearInterval(autoRefreshInterval);
+        autoRefreshInterval = null;
+      }
+
+      document.getElementById('app').classList.add('hidden');
+      document.getElementById('loginCard').classList.remove('hidden');
+      setStatus('loginStatus', 'Signed out.');
+      setStatus('appStatus', '');
+      setStatus('recordsStatus', '');
+      document.getElementById('rows').innerHTML = '';
+    }
+
+    document.getElementById('loginButton').addEventListener('click', login);
+    document.getElementById('password').addEventListener('keydown', (event) => {
+      if (event.key === 'Enter') {
+        login();
+      }
+    });
+
+    document.getElementById('refreshAll').addEventListener('click', async () => {
+      try {
+        await loadSettings();
+        await loadSubmissions();
+        setStatus('appStatus', 'Settings and records refreshed.');
+      } catch (error) {
+        setStatus('appStatus', `Error: ${error.message}`);
+      }
+    });
+
+    document.getElementById('loadButton').addEventListener('click', () => {
+      loadSubmissions().catch((error) => {
+        setStatus('recordsStatus', `Error: ${error.message}`);
+      });
+    });
+
+    document.getElementById('saveLock').addEventListener('click', () => {
+      saveLockSettings().catch((error) => {
+        setStatus('appStatus', `Error: ${error.message}`);
+      });
+    });
+
+    document.getElementById('registerModuleButton').addEventListener('click', () => {
+      registerModule().catch((error) => {
+        setStatus('appStatus', `Error: ${error.message}`);
+      });
+    });
+
+    document.getElementById('logoutButton').addEventListener('click', () => logout(true));
+
+    document.getElementById('autoRefresh').addEventListener('change', setupAutoRefresh);
+
+    document.getElementById('printButton').addEventListener('click', printRecordsOnly);
+
+    document.getElementById('clearButton').addEventListener('click', () => {
+      clearRecords().catch((error) => {
+        setStatus('recordsStatus', `Error: ${error.message}`);
+      });
+    });
+
+    // Attempt session resume on reload.
+    (async function bootstrap() {
+      try {
+        const sessionState = await adminFetch('/api/v1/admin/session');
+        csrfToken = String(sessionState.csrfToken || '');
+        if (!csrfToken) {
+          throw new Error('Missing CSRF token');
+        }
+        await initializeApp();
+      } catch (_error) {
+        logout(false);
+      }
+    })();
+  </script>
+</body>
+</html>
+
+

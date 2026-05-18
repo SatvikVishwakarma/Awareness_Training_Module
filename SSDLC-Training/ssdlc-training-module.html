@@ -1,0 +1,1904 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRC Engineering: Secure Software Development Lifecycle (SSDLC)</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      --primary-purple:#2563EB; --light-purple:#EAF2FF; --dark-purple:#1E3A8A;
+      --primary-teal:#0D9488; --light-teal:#CCFBF1; --dark-teal:#115E59;
+      --primary-off-black:#0F172A; --primary-white:#FFFFFF; --success-green:#16A34A;
+      --warning-amber:#D97706; --error-red:#DC2626; --neutral-gray:#55647D;
+      --light-gray:#F3F7FF; --medium-gray:#D7E2F2; --primary-gradient: linear-gradient(135deg, #2563EB 0%, #0D9488 100%);
+    }
+
+    body {
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+      background: #0a0e27;
+      color:var(--primary-off-black);
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
+      line-height:1.6;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: radial-gradient(circle at 20% 50%, rgba(37,99,235,0.15) 0%, transparent 50%),
+                  radial-gradient(circle at 80% 80%, rgba(37,99,235,0.1) 0%, transparent 50%),
+                  radial-gradient(circle at 40% 20%, rgba(0,85,204,0.1) 0%, transparent 50%);
+      z-index: -1;
+    }
+
+    .module-container {
+      background:var(--primary-white);
+      border-radius:16px;
+      box-shadow:0 10px 40px rgba(0,8,77,.25);
+      max-width:1100px;
+      width:100%;
+      overflow:hidden;
+    }
+
+    .grc-header {
+      background:var(--primary-gradient);
+      padding:20px 32px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color:var(--primary-white);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .grc-logo {
+      display:flex;
+      align-items:center;
+      gap:16px;
+      font-weight:700;
+      font-size:20px;
+      z-index: 2;
+    }
+
+    .grc-owl {
+      width:48px;
+      height:48px;
+      background:var(--primary-white);
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:28px;
+      animation: bounce 2s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+
+    .grc-owl:hover { transform: rotate(10deg) scale(1.1); }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .progress-bar {
+      height:6px;
+      background:var(--medium-gray);
+      position:relative;
+      overflow:hidden;
+    }
+
+    .progress-fill {
+      height:100%;
+      background:var(--primary-gradient);
+      width:0%;
+      transition:width .5s ease;
+      box-shadow: 0 0 10px rgba(37,99,235,0.5);
+    }
+
+    .slide {
+      padding:56px 48px;
+      min-height:580px;
+      display:none;
+      animation:slideIn .4s ease;
+      position: relative;
+    }
+
+    .slide.active { display:block; }
+
+    @keyframes slideIn {
+      from{ opacity:0; transform:translateX(30px); }
+      to{ opacity:1; transform:translateX(0); }
+    }
+
+    h1 {
+      color:var(--dark-purple);
+      font-size:2.5rem;
+      font-weight:800;
+      margin-bottom:24px;
+      text-align:center;
+      line-height:1.2;
+    }
+
+    h2 {
+      color:var(--dark-purple);
+      font-size:2rem;
+      font-weight:700;
+      margin-bottom:24px;
+    }
+
+    p {
+      font-size:1.125rem;
+      margin-bottom:20px;
+      color:var(--primary-off-black);
+      line-height:1.7;
+    }
+
+    .intro-animation {
+      font-size: 120px;
+      text-align: center;
+      margin: 40px 0;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.1); opacity: 0.8; }
+    }
+
+    .info-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 24px;
+      margin: 32px 0;
+    }
+
+    .info-card {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border: 2px solid var(--medium-gray);
+      border-radius: 12px;
+      padding: 24px;
+      text-align: center;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .info-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+      border-color: var(--primary-purple);
+    }
+
+    .info-card-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .info-card h3 {
+      color: var(--dark-purple);
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .navigation {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      margin-top:40px;
+      padding-top:32px;
+      border-top:2px solid var(--medium-gray);
+    }
+
+    .btn {
+      background:var(--primary-gradient);
+      color:var(--primary-white);
+      padding:14px 28px;
+      border:none;
+      border-radius:8px;
+      font-size:1rem;
+      font-weight:600;
+      cursor:pointer;
+      transition:all .3s ease;
+      margin:8px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn::before {
+      content: '';
+      position: absolute;
+      top: 50%; left: 50%;
+      width: 0; height: 0;
+      background: rgba(255,255,255,0.3);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn:hover::before { width: 300px; height: 300px; }
+
+    .btn:hover {
+      transform:translateY(-2px);
+      box-shadow:0 6px 20px rgba(37,99,235,.3);
+    }
+
+    .btn-secondary {
+      background:transparent;
+      color:var(--primary-purple);
+      border:2px solid var(--primary-purple);
+    }
+
+    .btn-secondary:hover {
+      background:var(--light-purple);
+      border-color:var(--dark-purple);
+      color:var(--dark-purple);
+    }
+
+    .btn-success { background: linear-gradient(135deg, #16A34A, #22C55E); }
+
+    .btn:disabled, .btn.disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+
+    /* Phase cards — mirroring owasp-item pattern */
+    .phase-item {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 2px solid #dee2e6;
+      border-radius: 12px;
+      margin-bottom: 12px;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .phase-item:hover {
+      border-color: var(--primary-purple);
+      box-shadow: 0 4px 12px rgba(37,99,235,0.15);
+      transform: translateX(4px);
+    }
+
+    .phase-item.active {
+      background: linear-gradient(135deg, var(--light-purple), #d4e4fc);
+      border-color: var(--primary-purple);
+    }
+
+    .phase-item[data-explored="true"] .phase-checkmark { opacity: 1; }
+
+    .phase-item[data-explored="true"] .phase-header {
+      background: linear-gradient(135deg, rgba(76,175,80,0.1), rgba(76,175,80,0.05));
+      border-radius: 8px;
+    }
+
+    .phase-header {
+      display: flex;
+      align-items: center;
+      padding: 16px 20px;
+      gap: 16px;
+    }
+
+    .phase-number {
+      background: var(--primary-purple);
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 15px;
+      flex-shrink: 0;
+    }
+
+    .phase-icon { font-size: 24px; flex-shrink: 0; }
+
+    .phase-title {
+      flex: 1;
+      font-weight: 600;
+      color: var(--dark-purple);
+      font-size: 16px;
+    }
+
+    .phase-checkmark {
+      color: var(--success-green);
+      font-size: 18px;
+      font-weight: bold;
+      margin-left: 8px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .phase-arrow {
+      color: #6c757d;
+      transition: transform 0.3s ease;
+      font-size: 14px;
+    }
+
+    .phase-item.active .phase-arrow { transform: rotate(90deg); }
+
+    .phase-detail {
+      display: none;
+      padding: 0 20px 20px 20px;
+      color: #495057;
+      line-height: 1.6;
+      border-top: 1px solid #dee2e6;
+      margin: 0 20px;
+      padding-top: 16px;
+    }
+
+    .phase-item.active .phase-detail {
+      display: block;
+      animation: slideDown 0.3s ease;
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; max-height: 0; }
+      to { opacity: 1; max-height: 600px; }
+    }
+
+    /* Decision grid */
+    .decision-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 24px;
+      position: relative;
+      z-index: 50;
+    }
+
+    .decision-btn {
+      background: #fff;
+      border: 2px solid #e0e0e0;
+      padding: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      text-align: center;
+      position: relative;
+    }
+
+    .decision-btn:hover {
+      background: var(--light-purple);
+      border-color: var(--primary-purple);
+      box-shadow: 0 4px 12px rgba(37,99,235,0.2);
+      transform: translateY(-2px);
+    }
+
+    /* Feedback */
+    .feedback {
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 20px;
+      font-size: 16px;
+      display: none;
+    }
+
+    .feedback.correct {
+      background: #d4edda;
+      color: #155724;
+      border: 2px solid var(--success-green);
+    }
+
+    .feedback.incorrect {
+      background: #f8d7da;
+      color: #721c24;
+      border: 2px solid var(--error-red);
+    }
+
+    .feedback.warning {
+      background: #fff3cd;
+      color: #856404;
+      border: 2px solid #ffc107;
+    }
+
+    /* Achievement popup */
+    .achievement {
+      position: fixed;
+      top: 20px;
+      right: -500px;
+      background: #fff;
+      padding: 16px 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      transition: right 0.5s ease;
+      z-index: 1000;
+      pointer-events: none;
+    }
+
+    .achievement.show { right: 20px; pointer-events: auto; }
+
+    .achievement-icon {
+      font-size: 32px;
+      animation: celebrate 0.5s ease;
+    }
+
+    @keyframes celebrate {
+      0% { transform: scale(0) rotate(0deg); }
+      50% { transform: scale(1.2) rotate(180deg); }
+      100% { transform: scale(1) rotate(360deg); }
+    }
+
+    /* Score display */
+    .score-display {
+      background: linear-gradient(135deg, #2563EB, #0D9488);
+      color: white;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      text-align: center;
+      margin: 20px 0;
+      font-size: 1.2rem;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+
+    /* Certificate */
+    .certificate {
+      text-align: center;
+      padding: 48px;
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+      border-radius: 16px;
+      border: 3px solid var(--primary-purple);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .certificate::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%;
+      width: 200%; height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(37,99,235,0.1), transparent);
+      animation: shine 3s linear infinite;
+    }
+
+    @keyframes shine {
+      0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+      100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+    }
+
+    .trophy-icon {
+      font-size: 80px;
+      color: #FFD700;
+      text-shadow: 0 0 20px rgba(255,215,0,0.5);
+      animation: trophyGlow 2s ease-in-out infinite;
+    }
+
+    @keyframes trophyGlow {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+
+/* Quiz styles */
+    .quiz-question {
+      background: #f8f9fa;
+      border: 2px solid var(--medium-gray);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .quiz-question h3 {
+      color: var(--dark-purple);
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+      font-weight: 700;
+    }
+
+    .quiz-options {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .quiz-option {
+      background: white;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.3s ease;
+      text-align: left;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .quiz-option:hover {
+      border-color: var(--primary-purple);
+      background: var(--light-purple);
+    }
+
+    .quiz-option.correct {
+      border-color: var(--success-green);
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .quiz-option.incorrect {
+      border-color: var(--error-red);
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .quiz-option.disabled {
+      pointer-events: none;
+      opacity: 0.7;
+    }
+
+    .quiz-letter {
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: var(--primary-purple);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 13px;
+      flex-shrink: 0;
+    }
+
+    /* Simulation box */
+    .simulation-box {
+      background: #1a1a1a;
+      border-radius: 12px;
+      padding: 0;
+      margin: 24px 0;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      overflow: hidden;
+    }
+
+    .browser-bar {
+      background: #2d2d2d;
+      padding: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 1px solid #444;
+    }
+
+    .browser-controls { display: flex; gap: 8px; }
+
+    .browser-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #ff5f57;
+    }
+
+    .browser-dot:nth-child(2) { background: #ffbd2e; }
+    .browser-dot:nth-child(3) { background: #28ca42; }
+
+    .url-bar {
+      flex: 1;
+      background: #1a1a1a;
+      color: #888;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+
+    .terminal-content {
+      background: #1e1e1e;
+      padding: 24px;
+      font-family: 'Monaco', 'Courier New', monospace;
+      font-size: 13px;
+      color: #d4d4d4;
+      line-height: 1.8;
+      min-height: 220px;
+    }
+
+    .terminal-line { display: block; margin-bottom: 4px; }
+    .terminal-line.success { color: #16A34A; }
+    .terminal-line.error { color: #DC2626; }
+    .terminal-line.warning { color: #D97706; }
+    .terminal-line.info { color: #2196F3; }
+    .terminal-line.dim { color: #666; }
+    .terminal-line.prompt { color: #a8ff78; }
+
+    /* Capstone */
+    .capstone-phase {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      padding: 20px;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .capstone-phase:hover {
+      border-color: var(--primary-purple);
+      box-shadow: 0 4px 12px rgba(37,99,235,0.12);
+      transform: translateX(4px);
+    }
+
+    .capstone-phase.done {
+      border-color: var(--success-green);
+      background: linear-gradient(135deg, #f0fff4, #e6f4ea);
+    }
+
+    .capstone-phase-num {
+      width: 40px; height: 40px;
+      border-radius: 50%;
+      background: var(--primary-gradient);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .capstone-phase.done .capstone-phase-num {
+      background: linear-gradient(135deg, #16A34A, #166534);
+    }
+
+    .capstone-phase-body h4 {
+      color: var(--dark-purple);
+      font-size: 1.05rem;
+      margin-bottom: 4px;
+      font-weight: 700;
+    }
+
+    .capstone-phase-body p {
+      font-size: 0.95rem;
+      color: #555;
+      margin: 0;
+      line-height: 1.5;
+    }
+
+    /* Objective list */
+    .objective-list {
+      list-style: none;
+      padding: 0;
+      margin: 20px 0;
+    }
+
+    .objective-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 14px 18px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 1px solid #dee2e6;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      font-size: 1rem;
+      color: #333;
+      transition: all 0.3s ease;
+    }
+
+    .objective-list li:hover {
+      border-color: var(--primary-purple);
+      background: linear-gradient(135deg, var(--light-purple), #e8effe);
+      transform: translateX(4px);
+    }
+
+    .objective-list li .obj-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    /* Assessment card */
+    .assessment-card {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 2px solid var(--medium-gray);
+      border-radius: 14px;
+      padding: 28px;
+      margin-bottom: 20px;
+      transition: all 0.3s ease;
+    }
+
+    .assessment-card:hover {
+      border-color: var(--primary-purple);
+      box-shadow: 0 6px 20px rgba(37,99,235,0.12);
+    }
+
+    .assessment-card h3 {
+      color: var(--dark-purple);
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Pipeline diagram */
+    .pipeline {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      margin: 24px 0;
+      overflow-x: auto;
+      padding-bottom: 8px;
+    }
+
+    .pipeline-step {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border: 2px solid #dee2e6;
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-align: center;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      min-width: 100px;
+      min-height: 72px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .pipeline-step:hover, .pipeline-step.active {
+      background: linear-gradient(135deg, var(--light-purple), #d4e4fc);
+      border-color: var(--primary-purple);
+      transform: translateY(-4px);
+      box-shadow: 0 6px 16px rgba(37,99,235,0.2);
+    }
+
+    .pipeline-step .ps-icon { display: none; }
+    .pipeline-step .ps-label { font-size: 12px; font-weight: 700; color: var(--dark-purple); }
+
+    .pipeline-arrow {
+      color: var(--primary-purple);
+      font-size: 20px;
+      padding: 0 4px;
+      flex-shrink: 0;
+    }
+
+    /* Stat row */
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px;
+      margin: 24px 0;
+    }
+
+    .stat-item {
+      text-align: center;
+      padding: 20px 12px;
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      border-radius: 12px;
+      border: 2px solid var(--medium-gray);
+    }
+
+    .stat-item .stat-number {
+      font-size: 2.2rem;
+      font-weight: 800;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1.2;
+    }
+
+    .stat-item .stat-label {
+      font-size: 0.85rem;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    /* Progress tracker for labs */
+    .progress-tracker {
+      background: var(--light-gray);
+      border-radius: 8px;
+      height: 8px;
+      margin: 8px 0 16px;
+      overflow: hidden;
+    }
+
+    .progress-tracker-fill {
+      height: 100%;
+      background: var(--primary-gradient);
+      border-radius: 8px;
+      transition: width 0.6s ease;
+    }
+
+    /* Responsive */
+    @media (max-width:768px) {
+      .slide { padding:32px 24px; }
+      h1 { font-size:2rem; }
+      h2 { font-size:1.5rem; }
+      .decision-grid { grid-template-columns: 1fr; }
+      .pipeline { flex-wrap: wrap; }
+    }
+  </style>
+
+  <link rel="stylesheet" href="../assets/modern-theme.css">
+</head>
+<body class="modern-theme module-app">
+
+  <!-- Achievement Popup -->
+  <div class="achievement" id="achievementPopup">
+    <div class="achievement-icon" id="achievementIcon"></div>
+    <div>
+      <div style="font-weight:700; color:var(--dark-purple);" id="achievementTitle">Achievement Unlocked!</div>
+      <div style="font-size:14px; color:#6c757d;" id="achievementText">You're making great progress!</div>
+    </div>
+  </div>
+
+  <div class="module-container">
+    <div class="grc-header">
+      <div class="grc-logo">
+        <span>Secure Software Development Lifecycle (SSDLC)</span>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressBar"></div></div>
+
+    <!-- ==================== SLIDE 1: Welcome ==================== -->
+    <div class="slide active" id="slide1">
+      <h1> Secure Software Development Lifecycle</h1>
+      <div class="intro-animation"></div>
+      <p style="text-align:center; font-size:1.4rem; margin-bottom:24px; color:#2563EB; font-weight:600;">
+        Integrate Security at Every Stage of Development
+      </p>
+
+      <div style="background:#f0f7ff; padding:24px; border-radius:12px; margin:20px auto; max-width:700px; border:1px solid #d0e4ff;">
+        <p style="font-size:1.1rem; color:#333; margin-bottom:16px; font-weight:600;">In this training you will learn to:</p>
+        <ul style="text-align:left; font-size:1rem; color:#555; line-height:1.8; max-width:520px; margin:0 auto; list-style:none;">
+          <li> <strong>Embed security</strong> into every phase of the software lifecycle</li>
+          <li> <strong>Apply threat modeling</strong> to identify risks before writing code</li>
+          <li> <strong>Build DevSecOps pipelines</strong> with automated security gates</li>
+          <li> <strong>Manage supply chain risks</strong> from third-party dependencies</li>
+          <li> <strong>Automate security testing</strong> across SAST, DAST, and SCA tools</li>
+        </ul>
+      </div>
+
+      <div class="stat-row" style="max-width:700px; margin:32px auto 0;">
+        <div class="stat-item">
+          <div class="stat-number">10</div>
+          <div class="stat-label">SSDLC Phases</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">~45</div>
+          <div class="stat-label">Minutes</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">9</div>
+          <div class="stat-label">Slides</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">CPE</div>
+          <div class="stat-label">Credit Eligible</div>
+        </div>
+      </div>
+
+      <div class="navigation">
+        <span></span>
+        <button class="btn" onclick="nextSlide()">Start Training </button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 2: Training Overview ==================== -->
+    <div class="slide" id="slide2">
+      <h2> Training Overview</h2>
+      <p>This module walks you through the complete Secure Software Development Lifecycle — a framework that shifts security <strong>left</strong>, embedding it proactively into every stage of development rather than bolting it on after deployment.</p>
+
+      <div style="background:#fff3cd; border:2px solid #ffc107; border-radius:12px; padding:20px; margin:20px 0;">
+        <p style="margin:0; color:#856404; font-weight:600; font-size:1rem;">
+           Why SSDLC Matters
+        </p>
+        <p style="margin:10px 0 0 0; color:#333; font-size:0.95rem;">
+          Studies show that fixing a security flaw in production costs <strong>30× more</strong> than fixing it during requirements. 83% of tested applications contain at least one security vulnerability. SSDLC is your blueprint to change that.
+        </p>
+      </div>
+
+      <div class="info-cards">
+        <div class="info-card">
+          <span class="info-card-icon"></span>
+          <h3>Plan &amp; Design</h3>
+          <p style="font-size:0.95rem; margin:0; color:#555;">Security requirements, threat modeling, and secure architecture form the bedrock before a single line of code is written.</p>
+        </div>
+        <div class="info-card">
+          <span class="info-card-icon"></span>
+          <h3>Build &amp; Test</h3>
+          <p style="font-size:0.95rem; margin:0; color:#555;">Secure coding practices, peer reviews, static analysis, and dependency scanning prevent vulnerabilities from entering the codebase.</p>
+        </div>
+        <div class="info-card">
+          <span class="info-card-icon"></span>
+          <h3>Deploy &amp; Operate</h3>
+          <p style="font-size:0.95rem; margin:0; color:#555;">CI/CD security gates, runtime monitoring, and incident response processes maintain security posture throughout the application lifecycle.</p>
+        </div>
+      </div>
+
+      <div style="background:#f0fff4; border:2px solid #16A34A; border-radius:12px; padding:20px; margin-top:12px;">
+        <p style="margin:0; color:#155724; font-weight:600; font-size:1rem;">
+           Module Approach
+        </p>
+        <p style="margin:10px 0 0 0; color:#333; font-size:0.95rem;">
+          Each phase is interactive and includes real-world examples, tooling guidance, and actionable remediation steps. Hands-on labs reinforce each concept. An assessment and capstone project complete your learning journey.
+        </p>
+      </div>
+
+      <div class="navigation">
+        <button class="btn btn-secondary" onclick="previousSlide()">Back</button>
+        <button class="btn" onclick="nextSlide()">Explore SSDLC Phases</button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 3: SSDLC Phases (1–5) ==================== -->
+    <div class="slide" id="slide3">
+      <h2> SSDLC Phases — Part 1</h2>
+      <p>Click each phase to explore the security activities, tools, and best practices involved. Explore all phases to unlock the next section.</p>
+
+      <div style="max-width:900px; margin:24px auto;" id="phaseList1">
+
+        <!-- Phase 1 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p1')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">1</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Security Requirements</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> Security requirements define what the software must do (and must not do) from a security perspective. They are derived from business context, regulatory obligations, and threat intelligence.</p>
+            <p><strong>Key activities:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li>Classify data assets and define sensitivity levels (PII, PCI, PHI)</li>
+              <li>Map applicable compliance requirements (SOC 2, GDPR, HIPAA, PCI-DSS)</li>
+              <li>Define authentication, authorisation, and session management requirements</li>
+              <li>Document cryptographic standards and key management policies</li>
+              <li>Establish logging, audit trail, and data retention policies</li>
+            </ul>
+            <p><strong>Tooling:</strong> JIRA security story templates, OWASP ASVS (Application Security Verification Standard), NIST SP 800-53 control catalogue.</p>
+            <p style="margin-top:12px;"><strong> Resource:</strong> <a href="https://owasp.org/www-project-application-security-verification-standard/" target="_blank" style="color:var(--primary-purple);">OWASP ASVS</a></p>
+          </div>
+        </div>
+
+        <!-- Phase 2 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p2')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">2</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Threat Modeling</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> Threat modeling is a structured process to identify, quantify, and address security threats before architecture is finalised. It answers: <em>What can go wrong- How bad would it be- What should we do about it?</em></p>
+            <p><strong>Frameworks:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li><strong>STRIDE</strong> — Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege</li>
+              <li><strong>PASTA</strong> — Process for Attack Simulation and Threat Analysis (risk-centric)</li>
+              <li><strong>LINDDUN</strong> — Privacy-focused threat model for data flows</li>
+              <li><strong>Attack Trees</strong> — Hierarchical decomposition of attacker goals</li>
+            </ul>
+            <p><strong>Process:</strong> Define scope - Create Data Flow Diagrams (DFDs) - Identify trust boundaries - Enumerate threats - Rate severity (DREAD/CVSS) - Prioritise mitigations.</p>
+            <p><strong>Tooling:</strong> Microsoft Threat Modeling Tool, OWASP Threat Dragon, IriusRisk, draw.io with STRIDE templates.</p>
+          </div>
+        </div>
+
+        <!-- Phase 3 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p3')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">3</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Secure Architecture Design</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> Translating security requirements and threat model findings into concrete architectural decisions — the blueprints that make the system defensible by default.</p>
+            <p><strong>Core principles to apply:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li><strong>Least Privilege</strong> — components only access what they strictly need</li>
+              <li><strong>Defence in Depth</strong> — multiple independent security controls at each layer</li>
+              <li><strong>Zero Trust</strong> — never trust, always verify; micro-segment services</li>
+              <li><strong>Fail-Safe Defaults</strong> — default state should deny access, not grant it</li>
+              <li><strong>Separation of Concerns</strong> — isolate sensitive functions (auth, payments, PII)</li>
+            </ul>
+            <p><strong>Patterns:</strong> API Gateway + WAF for perimeter, service mesh for east-west mTLS, secrets vault for credentials, immutable infrastructure for deployment integrity.</p>
+            <p><strong>Tooling:</strong> AWS Well-Architected Tool, TOGAF, SABSA, Architectural Decision Records (ADRs).</p>
+          </div>
+        </div>
+
+        <!-- Phase 4 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p4')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">4</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Secure Coding Practices</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> A set of developer habits and standards that prevent common classes of vulnerability from being introduced during implementation.</p>
+            <p><strong>Top coding rules:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li>Always use parameterised queries — never concatenate SQL with user input</li>
+              <li>Validate and sanitise all inputs; reject unexpected data at the boundary</li>
+              <li>Encode outputs context-appropriately (HTML encode for DOM, SQL escape for DB)</li>
+              <li>Use strong, well-vetted cryptographic libraries — never roll your own crypto</li>
+              <li>Store passwords with bcrypt/Argon2 (salt + high work factor); never SHA-1/MD5</li>
+              <li>Avoid hard-coded credentials; load secrets from environment or vault</li>
+              <li>Apply error handling that reveals nothing to the user; log internally</li>
+            </ul>
+            <p><strong>Standards:</strong> OWASP Secure Coding Practices Quick Reference, SEI CERT Coding Standards, CWE Top 25 Most Dangerous Software Weaknesses.</p>
+          </div>
+        </div>
+
+        <!-- Phase 5 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p5')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">5</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Code Review &amp; Static Analysis</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> A combination of manual peer review (security-focused) and automated Static Application Security Testing (SAST) to identify vulnerabilities before code is merged.</p>
+            <p><strong>Manual security code review checklist:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li>Check all entry points for input validation and sanitisation</li>
+              <li>Review authentication and session management logic end-to-end</li>
+              <li>Verify authorisation checks on every sensitive endpoint</li>
+              <li>Identify sensitive data in logs, error messages, or HTTP responses</li>
+              <li>Look for insecure direct object references (IDOR)</li>
+            </ul>
+            <p><strong>SAST tooling:</strong> Semgrep, SonarQube, Checkmarx, Veracode, Snyk Code, Bandit (Python), SpotBugs (Java), ESLint Security Plugin (JS/TS).</p>
+            <p><strong>Best practice:</strong> Block PRs with critical/high SAST findings. Track findings in a Security Defect Backlog (SDB) with SLAs based on severity.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="phase1Progress" style="text-align:center; margin-top:12px; color:#6c757d; font-size:0.95rem;">
+        <span id="phase1Count">0</span> of 5 phases explored
+      </div>
+      <div class="progress-tracker"><div class="progress-tracker-fill" id="phase1Bar" style="width:0%"></div></div>
+
+      <div class="navigation">
+        <button class="btn btn-secondary" onclick="previousSlide()">Back</button>
+        <button class="btn" onclick="nextSlide()" id="phase1Continue" style="display:none;">Phases 6–10</button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 4: SSDLC Phases (6–10) ==================== -->
+    <div class="slide" id="slide4">
+      <h2> SSDLC Phases — Part 2</h2>
+      <p>Continue exploring the remaining phases that cover the build, ship, and operate stages of the lifecycle.</p>
+
+      <div style="max-width:900px; margin:24px auto;" id="phaseList2">
+
+        <!-- Phase 6 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p6')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">6</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Dependency &amp; Supply Chain Security</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> Modern software is largely composed of open-source libraries and third-party components. Supply chain attacks (e.g., SolarWinds, Log4Shell, XZ Utils) exploit trust in this dependency graph.</p>
+            <p><strong>Key practices:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li>Generate and maintain a <strong>Software Bill of Materials (SBOM)</strong> in SPDX or CycloneDX format</li>
+              <li>Run <strong>Software Composition Analysis (SCA)</strong> on every build and block critical CVEs</li>
+              <li>Pin exact dependency versions; use lock files (package-lock.json, poetry.lock, go.sum)</li>
+              <li>Verify package integrity with checksums and signatures before install</li>
+              <li>Monitor for newly disclosed CVEs via OSV.dev, GitHub Advisory Database, or Dependabot</li>
+              <li>Evaluate transitive dependencies — a chain of 3 hops can hide a critical flaw</li>
+            </ul>
+            <p><strong>Tooling:</strong> Snyk, OWASP Dependency-Check, Trivy, Grype, Socket.dev, GitHub Dependabot, Google OSS-Fuzz.</p>
+          </div>
+        </div>
+
+        <!-- Phase 7 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p7')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">7</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">CI/CD Security Integration</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> Embedding security checks as automated quality gates within the CI/CD pipeline — the DevSecOps model. Security becomes a shared responsibility across development and operations.</p>
+            <p><strong>Pipeline security gates:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li><strong>Pre-commit hooks:</strong> secrets detection (gitleaks, detect-secrets), lint rules</li>
+              <li><strong>PR / merge gate:</strong> SAST scan, licence compliance, SBOM generation</li>
+              <li><strong>Build stage:</strong> container image scanning (Trivy, Grype), SCA, signing</li>
+              <li><strong>Staging deployment:</strong> DAST scan, IAST agents, API fuzzing</li>
+              <li><strong>Production gate:</strong> policy-as-code (OPA/Conftest), change management approval</li>
+            </ul>
+            <p><strong>Tooling:</strong> GitHub Actions, GitLab CI Security, Jenkins + OWASP ZAP, Tekton Chains, Sigstore/Cosign for artefact signing, HashiCorp Vault for secrets.</p>
+            <p><strong>Key principle:</strong> "Security as Code" — store policies, scan configs, and security tests in version control alongside application code.</p>
+          </div>
+        </div>
+
+        <!-- Phase 8 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p8')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">8</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Application Security Testing</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> A multi-layered testing strategy that exercises the application for security flaws from multiple angles — white-box, black-box, and grey-box.</p>
+            <p><strong>Testing types:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li><strong>SAST (Static)</strong> — analyse source code without executing (shift-left)</li>
+              <li><strong>DAST (Dynamic)</strong> — probe a running application for vulnerabilities (OWASP ZAP, Burp Suite)</li>
+              <li><strong>IAST (Interactive)</strong> — instrument agents observe the app during functional tests</li>
+              <li><strong>Penetration Testing</strong> — manual expert-led adversarial testing on a cadence (annual minimum)</li>
+              <li><strong>Fuzz Testing</strong> — supply random/mutated inputs to uncover crashes and unexpected behaviour</li>
+              <li><strong>API Security Testing</strong> — validate REST/GraphQL endpoints against OWASP API Top 10</li>
+            </ul>
+            <p><strong>Coverage goals:</strong> Aim for 100% of critical paths covered by automated DAST or IAST in staging. Manual pen tests for privilege escalation, business logic, and auth bypass.</p>
+          </div>
+        </div>
+
+        <!-- Phase 9 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p9')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">9</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Secure Deployment</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> Hardening the runtime environment and deployment process to minimise attack surface and ensure that security configurations are consistent and immutable.</p>
+            <p><strong>Deployment security checklist:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li>Use hardened, minimal base images (distroless, Alpine); no SSH daemons</li>
+              <li>Run containers as non-root; enforce read-only filesystems where possible</li>
+              <li>Apply Kubernetes Pod Security Standards (restricted profile); disable privilege escalation</li>
+              <li>Store all secrets in a vault (HashiCorp Vault, AWS Secrets Manager, GCP Secret Manager)</li>
+              <li>Apply network policies to limit pod-to-pod communication (zero-trust east-west)</li>
+              <li>Enable mTLS between services using a service mesh (Istio, Linkerd)</li>
+              <li>Sign container images and verify signatures at admission (Sigstore/Cosign + OPA Gatekeeper)</li>
+            </ul>
+            <p><strong>IaC Security:</strong> Scan Terraform/CloudFormation with Checkov, tfsec, or Snyk IaC to catch misconfigurations before provisioning.</p>
+          </div>
+        </div>
+
+        <!-- Phase 10 -->
+        <div class="phase-item" onclick="togglePhase(this, 'p10')" data-explored="false">
+          <div class="phase-header">
+            <span class="phase-number">10</span>
+            <span class="phase-icon"></span>
+            <span class="phase-title">Runtime Monitoring &amp; Incident Response</span>
+            <span class="phase-checkmark">OK</span>
+            <span class="phase-arrow">➡️</span>
+          </div>
+          <div class="phase-detail">
+            <p><strong>What it is:</strong> Continuous observation of the production environment to detect attacks, anomalies, and policy violations — and a tested playbook to respond effectively when they occur.</p>
+            <p><strong>Monitoring stack:</strong></p>
+            <ul style="margin:8px 0; padding-left:20px;">
+              <li><strong>SIEM</strong> — centralised log aggregation and correlation (Splunk, Elastic SIEM, Microsoft Sentinel)</li>
+              <li><strong>RASP</strong> — Runtime Application Self-Protection agents block attacks inline</li>
+              <li><strong>WAF</strong> — filter malicious HTTP traffic before it reaches the application (AWS WAF, Cloudflare)</li>
+              <li><strong>CSPM</strong> — Cloud Security Posture Management detects cloud misconfigurations (Wiz, Prisma Cloud)</li>
+              <li><strong>EDR/XDR</strong> — endpoint and extended detection and response on hosts</li>
+            </ul>
+            <p><strong>Incident Response steps (PICERL):</strong> Preparation - Identification - Containment - Eradication - Recovery - Lessons Learned. Conduct tabletop exercises quarterly and full simulations annually.</p>
+            <p><strong>Security SLOs:</strong> Define Mean Time to Detect (MTTD) and Mean Time to Respond (MTTR) targets and measure against them in dashboards.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="phase2Progress" style="text-align:center; margin-top:12px; color:#6c757d; font-size:0.95rem;">
+        <span id="phase2Count">0</span> of 5 phases explored
+      </div>
+      <div class="progress-tracker"><div class="progress-tracker-fill" id="phase2Bar" style="width:0%"></div></div>
+
+      <div class="navigation">
+        <button class="btn btn-secondary" onclick="previousSlide()">Back</button>
+        <button class="btn" onclick="nextSlide()" id="phase2Continue" style="display:none;">Learning Objectives</button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 5: Learning Objectives ==================== -->
+    <div class="slide" id="slide5">
+      <h2> Learning Objectives</h2>
+      <p>By the end of this training, you will be able to confidently apply the following skills in your day-to-day engineering work:</p>
+
+      <ul class="objective-list">
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Integrate security into development workflows</strong> — apply the "shift-left" principle by embedding security activities at requirements, design, and build stages rather than waiting for post-deployment audits.</div>
+        </li>
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Prevent OWASP Top 10 vulnerabilities</strong> — understand the root cause of injection flaws, broken authentication, SSRF, and other critical web application risks and apply mitigations proactively in code.</div>
+        </li>
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Implement DevSecOps pipelines</strong> — configure CI/CD security gates that automatically block critical vulnerabilities from reaching production, treating security as a pipeline citizen alongside tests and linting.</div>
+        </li>
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Automate security testing</strong> — leverage SAST, DAST, IAST, and fuzz testing tools to achieve continuous security coverage without slowing delivery cadence.</div>
+        </li>
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Manage software supply chain risks</strong> — generate SBOMs, enforce SCA policies, monitor for new CVEs in dependencies, and respond to supply chain compromise scenarios.</div>
+        </li>
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Conduct threat modeling sessions</strong> — lead STRIDE-based threat model workshops, produce Data Flow Diagrams, and translate threat findings into actionable security stories for the sprint backlog.</div>
+        </li>
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Design secure system architectures</strong> — apply zero-trust, least privilege, and defence-in-depth principles to create systems that are resilient against known attack patterns.</div>
+        </li>
+        <li>
+          <span class="obj-icon"></span>
+          <div><strong>Operate runtime security controls</strong> — configure monitoring, alerting, and incident response playbooks to detect and respond to threats in production within defined SLO targets.</div>
+        </li>
+      </ul>
+
+      <div class="navigation">
+        <button class="btn btn-secondary" onclick="previousSlide()">Back</button>
+        <button class="btn" onclick="nextSlide()">Pipeline Simulation</button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 6: CI/CD Pipeline Simulation ==================== -->
+    <div class="slide" id="slide6">
+      <h2> Interactive: DevSecOps Pipeline Simulation</h2>
+      <p>Click each stage of the pipeline to see what security checks run and what happens when a critical vulnerability is detected. Explore all stages to continue.</p>
+
+      <div class="pipeline" id="pipelineRow">
+        <div class="pipeline-step" onclick="runPipelineStage(0)" id="ps0">
+          <span class="ps-icon"></span>
+          <span class="ps-label">Commit</span>
+        </div>
+        <span class="pipeline-arrow">➡️</span>
+        <div class="pipeline-step" onclick="runPipelineStage(1)" id="ps1">
+          <span class="ps-icon"></span>
+          <span class="ps-label">Secrets Scan</span>
+        </div>
+        <span class="pipeline-arrow">➡️</span>
+        <div class="pipeline-step" onclick="runPipelineStage(2)" id="ps2">
+          <span class="ps-icon"></span>
+          <span class="ps-label">SAST</span>
+        </div>
+        <span class="pipeline-arrow">➡️</span>
+        <div class="pipeline-step" onclick="runPipelineStage(3)" id="ps3">
+          <span class="ps-icon"></span>
+          <span class="ps-label">SCA</span>
+        </div>
+        <span class="pipeline-arrow">➡️</span>
+        <div class="pipeline-step" onclick="runPipelineStage(4)" id="ps4">
+          <span class="ps-icon"></span>
+          <span class="ps-label">Build &amp; Sign</span>
+        </div>
+        <span class="pipeline-arrow">➡️</span>
+        <div class="pipeline-step" onclick="runPipelineStage(5)" id="ps5">
+          <span class="ps-icon"></span>
+          <span class="ps-label">DAST</span>
+        </div>
+        <span class="pipeline-arrow">➡️</span>
+        <div class="pipeline-step" onclick="runPipelineStage(6)" id="ps6">
+          <span class="ps-icon"></span>
+          <span class="ps-label">Deploy</span>
+        </div>
+      </div>
+
+      <div class="simulation-box">
+        <div class="browser-bar">
+          <div class="browser-controls">
+            <div class="browser-dot"></div>
+            <div class="browser-dot"></div>
+            <div class="browser-dot"></div>
+          </div>
+          <div class="url-bar" id="pipelineStatus"> CI/CD Pipeline — Click a stage above to simulate</div>
+        </div>
+        <div class="terminal-content" id="terminalOutput">
+          <span class="terminal-line dim">$ git push origin feature/user-auth</span>
+          <span class="terminal-line dim">Enumerating objects: 5, done.</span>
+          <span class="terminal-line dim">Writing objects: 100% (5/5), 1.22 KiB | 1.22 MiB/s, done.</span>
+          <span class="terminal-line info">- Pipeline triggered. Click a stage above to run it.</span>
+        </div>
+      </div>
+
+      <div id="pipelineProgress" style="text-align:center; margin-top:8px; color:#6c757d; font-size:0.95rem;">
+        <span id="stageCount">0</span> of 7 stages explored
+      </div>
+      <div class="progress-tracker"><div class="progress-tracker-fill" id="pipelineBar" style="width:0%"></div></div>
+
+      <div class="navigation">
+        <button class="btn btn-secondary" onclick="previousSlide()">Back</button>
+        <button class="btn" onclick="nextSlide()" id="pipelineContinue" style="display:none;">Assessment</button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 7: Assessment Quiz ==================== -->
+    <div class="slide" id="slide7">
+      <h2> Assessment: Knowledge Check</h2>
+      <p>Test your understanding of SSDLC concepts. Answer all questions to unlock the final project.</p>
+
+      <div class="score-display" id="quizScoreDisplay" style="display:none;">
+        Score: <span id="quizScore">0</span> / 4 correct
+      </div>
+
+      <!-- Q1 -->
+      <div class="quiz-question" id="qq1">
+        <h3>Q1. Which threat modeling framework categorises threats into Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, and Elevation of Privilege?</h3>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(1, 'A', false)"><span class="quiz-letter">A</span> PASTA</button>
+          <button class="quiz-option" onclick="answerQuiz(1, 'B', true)"><span class="quiz-letter">B</span> STRIDE</button>
+          <button class="quiz-option" onclick="answerQuiz(1, 'C', false)"><span class="quiz-letter">C</span> DREAD</button>
+          <button class="quiz-option" onclick="answerQuiz(1, 'D', false)"><span class="quiz-letter">D</span> LINDDUN</button>
+        </div>
+        <div class="feedback" id="qfb1"></div>
+      </div>
+
+      <!-- Q2 -->
+      <div class="quiz-question" id="qq2">
+        <h3>Q2. A developer discovers a critical CVE (CVSS 9.8) in a production dependency. What is the correct immediate action?</h3>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(2, 'A', false)"><span class="quiz-letter">A</span> Log it as a low-priority ticket and review next sprint</button>
+          <button class="quiz-option" onclick="answerQuiz(2, 'B', false)"><span class="quiz-letter">B</span> Ignore it — the package is only in dev dependencies</button>
+          <button class="quiz-option" onclick="answerQuiz(2, 'C', true)"><span class="quiz-letter">C</span> Update the package immediately, test, and deploy a patched build</button>
+          <button class="quiz-option" onclick="answerQuiz(2, 'D', false)"><span class="quiz-letter">D</span> Wait for the library maintainer to auto-patch it</button>
+        </div>
+        <div class="feedback" id="qfb2"></div>
+      </div>
+
+      <!-- Q3 -->
+      <div class="quiz-question" id="qq3">
+        <h3>Q3. Which type of security testing analyses source code WITHOUT executing the application?</h3>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(3, 'A', false)"><span class="quiz-letter">A</span> DAST — Dynamic Application Security Testing</button>
+          <button class="quiz-option" onclick="answerQuiz(3, 'B', false)"><span class="quiz-letter">B</span> IAST — Interactive Application Security Testing</button>
+          <button class="quiz-option" onclick="answerQuiz(3, 'C', true)"><span class="quiz-letter">C</span> SAST — Static Application Security Testing</button>
+          <button class="quiz-option" onclick="answerQuiz(3, 'D', false)"><span class="quiz-letter">D</span> Penetration Testing</button>
+        </div>
+        <div class="feedback" id="qfb3"></div>
+      </div>
+
+      <!-- Q4 -->
+      <div class="quiz-question" id="qq4">
+        <h3>Q4. What document catalogues all third-party components and open-source libraries used in an application, including their versions and licences?</h3>
+        <div class="quiz-options">
+          <button class="quiz-option" onclick="answerQuiz(4, 'A', false)"><span class="quiz-letter">A</span> Penetration Test Report</button>
+          <button class="quiz-option" onclick="answerQuiz(4, 'B', true)"><span class="quiz-letter">B</span> Software Bill of Materials (SBOM)</button>
+          <button class="quiz-option" onclick="answerQuiz(4, 'C', false)"><span class="quiz-letter">C</span> Security Requirements Document</button>
+          <button class="quiz-option" onclick="answerQuiz(4, 'D', false)"><span class="quiz-letter">D</span> CI/CD Configuration Manifest</button>
+        </div>
+        <div class="feedback" id="qfb4"></div>
+      </div>
+
+      <div id="quizFeedbackSummary" style="margin-top:16px;"></div>
+
+      <div class="navigation">
+        <button class="btn btn-secondary" onclick="previousSlide()">Back</button>
+        <button class="btn" onclick="nextSlide()" id="quizContinue" style="display:none;">Final Capstone</button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 8: Final Capstone Project ==================== -->
+    <div class="slide" id="slide8">
+      <h2> Final Capstone Project</h2>
+      <p>Apply SSDLC principles end-to-end by securing a deliberately vulnerable web application (<strong>OWASP Juice Shop</strong>). Walk through each project phase below, then mark it complete.</p>
+
+      <div style="background:#f0f7ff; border:2px solid #d0e4ff; border-radius:12px; padding:20px; margin:20px 0;">
+        <p style="margin:0; font-weight:600; color:#1565c0;"> Project Goal</p>
+        <p style="margin:10px 0 0 0; color:#333; font-size:0.97rem;">
+          Take the OWASP Juice Shop application from "vulnerable" to "production-ready" by systematically applying all ten SSDLC phases. Document your findings in a Security Remediation Report and present key metrics.
+        </p>
+      </div>
+
+      <div id="capstonePhases">
+
+        <div class="capstone-phase" onclick="markCapstone(0)" id="cp0">
+          <div class="capstone-phase-num">1</div>
+          <div class="capstone-phase-body">
+            <h4>Define Security Requirements</h4>
+            <p>Identify Juice Shop's data assets (user credentials, payment data), classify sensitivity, and write 5 ASVS-mapped security stories in your backlog.</p>
+          </div>
+        </div>
+
+        <div class="capstone-phase" onclick="markCapstone(1)" id="cp1">
+          <div class="capstone-phase-num">2</div>
+          <div class="capstone-phase-body">
+            <h4>Threat Model the Application</h4>
+            <p>Draw a DFD for the checkout and login flows. Apply STRIDE to identify at least 8 threats. Rate each with CVSS and prioritise the top 3 for immediate remediation.</p>
+          </div>
+        </div>
+
+        <div class="capstone-phase" onclick="markCapstone(2)" id="cp2">
+          <div class="capstone-phase-num">3</div>
+          <div class="capstone-phase-body">
+            <h4>Run SAST &amp; Manual Code Review</h4>
+            <p>Execute Semgrep with the OWASP ruleset against the Juice Shop source. Manually review the authentication module. Document all critical and high findings with CWE references.</p>
+          </div>
+        </div>
+
+        <div class="capstone-phase" onclick="markCapstone(3)" id="cp3">
+          <div class="capstone-phase-num">4</div>
+          <div class="capstone-phase-body">
+            <h4>SCA &amp; SBOM Generation</h4>
+            <p>Run Trivy against the package.json. Generate a CycloneDX SBOM. Identify packages with critical CVEs and update them. Verify the build passes after upgrades.</p>
+          </div>
+        </div>
+
+        <div class="capstone-phase" onclick="markCapstone(4)" id="cp4">
+          <div class="capstone-phase-num">5</div>
+          <div class="capstone-phase-body">
+            <h4>Build CI/CD Security Pipeline</h4>
+            <p>Create a GitHub Actions workflow that runs secrets scanning, SAST, SCA, and container image scanning. Configure the pipeline to fail on critical findings and post results as PR comments.</p>
+          </div>
+        </div>
+
+        <div class="capstone-phase" onclick="markCapstone(5)" id="cp5">
+          <div class="capstone-phase-num">6</div>
+          <div class="capstone-phase-body">
+            <h4>DAST Scan &amp; API Security Testing</h4>
+            <p>Run OWASP ZAP in full-scan mode against a local Juice Shop instance. Use OWASP API Security Top 10 as your checklist for the REST API endpoints. Document all confirmed vulnerabilities.</p>
+          </div>
+        </div>
+
+        <div class="capstone-phase" onclick="markCapstone(6)" id="cp6">
+          <div class="capstone-phase-num">7</div>
+          <div class="capstone-phase-body">
+            <h4>Remediate &amp; Validate</h4>
+            <p>Fix the top 5 vulnerabilities identified (parameterise SQL queries, add Content Security Policy headers, implement rate limiting, enforce bcrypt for passwords, sanitise output). Re-run all scans to confirm fixes.</p>
+          </div>
+        </div>
+
+        <div class="capstone-phase" onclick="markCapstone(7)" id="cp7">
+          <div class="capstone-phase-num">8</div>
+          <div class="capstone-phase-body">
+            <h4>Write Security Remediation Report</h4>
+            <p>Produce a 1–2 page executive summary covering: vulnerabilities found, risk ratings, remediations applied, residual risk, and MTTD/MTTR metrics for any runtime monitoring configured.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div id="capstoneProgress" style="text-align:center; margin-top:12px; color:#6c757d; font-size:0.95rem;">
+        <span id="capstoneCount">0</span> of 8 phases complete
+      </div>
+      <div class="progress-tracker"><div class="progress-tracker-fill" id="capstoneBar" style="width:0%"></div></div>
+
+      <div id="capstoneFeedback" style="margin-top:16px;"></div>
+
+      <div class="navigation">
+        <button class="btn btn-secondary" onclick="previousSlide()">Back</button>
+        <button class="btn" onclick="completeModule()" id="capstoneContinue" style="display:none;">Exit Training</button>
+      </div>
+    </div>
+
+    <!-- ==================== SLIDE 9: Certificate ==================== -->
+    <div class="slide" id="slide9">
+      <div class="certificate">
+        <div class="trophy-icon"></div>
+        <h1 style="color:var(--primary-purple); margin:24px 0;">SSDLC Champion!</h1>
+        <p style="font-size:1.25rem; color:var(--dark-purple); margin-bottom:8px;">
+          You have successfully completed the
+        </p>
+        <p style="font-size:1.4rem; font-weight:800; color:var(--primary-purple); margin-bottom:32px;">
+          Secure Software Development Lifecycle Training
+        </p>
+
+        <div class="stat-row" style="max-width:600px; margin:0 auto 32px;">
+          <div class="stat-item">
+            <div class="stat-number" id="finalScore">100%</div>
+            <div class="stat-label">Assessment Score</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">10</div>
+            <div class="stat-label">Phases Mastered</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">5</div>
+            <div class="stat-label">Slides Completed</div>
+          </div>
+        </div>
+
+        <p style="color:var(--dark-purple); font-size:1rem; margin-bottom:8px; max-width:600px; margin-left:auto; margin-right:auto;">
+          You can now integrate security seamlessly across the software development lifecycle — from requirements through to runtime monitoring.
+        </p>
+
+        <p style="color:var(--primary-purple); font-weight:600; font-size:1.125rem; margin-top:24px;">
+          Build it secure. Ship it safe. 🏆
+        </p>
+
+        <button class="btn" onclick="completeModule()" style="margin-top:32px;">Exit Training</button>
+      </div>
+    </div>
+
+  </div><!-- /.module-container -->
+<script>
+    // --- State ----------------------------------------------------------------
+    var gameState = {
+      currentSlide: 1,
+      totalSlides: 9,
+      achievements: [],
+      moduleCompleted: false,
+      phasesExplored1: new Set(),
+      phasesExplored2: new Set(),
+      labsDone: new Set(), // kept for compatibility
+      stagesExplored: new Set(),
+      quizAnswers: {},
+      quizScore: 0,
+      capstonePhases: new Set()
+    };
+// --- Navigation ------------------------------------------------------------
+    function showSlide(n) {
+      document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+      var target = document.getElementById('slide' + n);
+      if (target) target.classList.add('active');
+      gameState.currentSlide = n;
+      updateProgress();
+      window.scrollTo(0, 0);
+    }
+
+    function nextSlide() {
+      if (gameState.currentSlide < gameState.totalSlides) {
+        showSlide(gameState.currentSlide + 1);
+      }
+    }
+
+    function previousSlide() {
+      if (gameState.currentSlide > 1) {
+        showSlide(gameState.currentSlide - 1);
+      }
+    }
+
+    function updateProgress() {
+      var pct = ((gameState.currentSlide - 1) / (gameState.totalSlides - 1)) * 100;
+      document.getElementById('progressBar').style.width = pct + '%';
+    }
+
+    // --- Achievement -----------------------------------------------------------
+    function showAchievement(icon, title, text) {
+      var el = document.getElementById('achievementPopup');
+      document.getElementById('achievementIcon').textContent = icon;
+      document.getElementById('achievementTitle').textContent = title;
+      document.getElementById('achievementText').textContent = text;
+      el.classList.add('show');
+      setTimeout(function() { el.classList.remove('show'); }, 3500);
+    }
+
+    // --- Phase Toggle (Slides 3 & 4) ------------------------------------------
+    function togglePhase(el, id) {
+      var wasActive = el.classList.contains('active');
+      // Close all in same container
+      var container = el.closest('[id^="phaseList"]');
+      if (container) {
+        container.querySelectorAll('.phase-item').forEach(function(pi) { pi.classList.remove('active'); });
+      }
+      if (!wasActive) {
+        el.classList.add('active');
+      }
+      // Mark as explored
+      if (el.getAttribute('data-explored') !== 'true') {
+        el.setAttribute('data-explored', 'true');
+        var num = parseInt(id.replace('p', ''));
+        if (num <= 5) {
+          gameState.phasesExplored1.add(id);
+          updatePhase1Progress();
+        } else {
+          gameState.phasesExplored2.add(id);
+          updatePhase2Progress();
+        }
+        if (!gameState.achievements.includes('phase_' + id)) {
+          gameState.achievements.push('phase_' + id);
+        }
+      }
+    }
+
+    function updatePhase1Progress() {
+      var count = gameState.phasesExplored1.size;
+      document.getElementById('phase1Count').textContent = count;
+      document.getElementById('phase1Bar').style.width = (count / 5 * 100) + '%';
+      if (count === 5) {
+        document.getElementById('phase1Continue').style.display = 'inline-flex';
+        showAchievement('', 'Phase Explorer!', 'You explored all 5 initial SSDLC phases!');
+      }
+    }
+
+    function updatePhase2Progress() {
+      var count = gameState.phasesExplored2.size;
+      document.getElementById('phase2Count').textContent = count;
+      document.getElementById('phase2Bar').style.width = (count / 5 * 100) + '%';
+      if (count === 5) {
+        document.getElementById('phase2Continue').style.display = 'inline-flex';
+        showAchievement('', 'Full Lifecycle!', 'All 10 SSDLC phases explored!');
+      }
+    }
+
+    // --- CI/CD Pipeline Simulation (Slide 6) ----------------------------------
+    var pipelineData = [
+      {
+        label: 'git push',
+        status: ' Commit Stage — code pushed to remote',
+        lines: [
+          { cls: 'prompt', text: '$ git push origin feature/user-auth' },
+          { cls: 'info', text: '[feature/user-auth] - Pipeline triggered' },
+          { cls: 'success', text: '- Commit received. Running pre-commit hooks...' }
+        ]
+      },
+      {
+        label: 'Secrets Scan',
+        status: ' Secrets Scanning — gitleaks + detect-secrets',
+        lines: [
+          { cls: 'prompt', text: '$ gitleaks detect --source . --verbose' },
+          { cls: 'warning', text: '- Scanning 142 files...' },
+          { cls: 'error', text: ' BLOCKER: Hardcoded AWS_SECRET_KEY found in config/db.js:14' },
+          { cls: 'error', text: '   Commit rejected. Remove secret and use AWS Secrets Manager.' },
+          { cls: 'dim', text: ' Fix: const secret = process.env.AWS_SECRET_KEY || vault.get("aws/secret")' }
+        ]
+      },
+      {
+        label: 'SAST',
+        status: ' SAST — Semgrep with OWASP ruleset',
+        lines: [
+          { cls: 'prompt', text: '$ semgrep --config=p/owasp-top-ten .' },
+          { cls: 'info', text: 'Scanning 87 files with 320 rules...' },
+          { cls: 'error', text: ' HIGH: sql-injection in routes/users.js:42 (CWE-89)' },
+          { cls: 'warning', text: ' MEDIUM: xss-reflected in views/search.html:18 (CWE-79)' },
+          { cls: 'success', text: '- Scan complete: 1 high, 1 medium, 3 info' },
+          { cls: 'error', text: '- Build BLOCKED: critical/high findings must be fixed before merge.' }
+        ]
+      },
+      {
+        label: 'SCA',
+        status: ' Software Composition Analysis — Trivy',
+        lines: [
+          { cls: 'prompt', text: '$ trivy fs --security-checks vuln,secret .' },
+          { cls: 'info', text: 'Analysing package-lock.json (237 packages)...' },
+          { cls: 'error', text: ' CRITICAL: lodash@4.17.15 — Prototype Pollution (CVE-2021-23337, CVSS 9.8)' },
+          { cls: 'warning', text: ' HIGH: axios@0.21.1 — SSRF (CVE-2023-45857, CVSS 8.8)' },
+          { cls: 'success', text: '- SBOM generated: sbom-cyclonedx.json' },
+          { cls: 'error', text: '- Build BLOCKED: update critical packages before proceeding.' }
+        ]
+      },
+      {
+        label: 'Build & Sign',
+        status: ' Container Build & Image Signing — Cosign',
+        lines: [
+          { cls: 'prompt', text: '$ docker build -t myapp:1.4.2 .' },
+          { cls: 'success', text: '- Image built: sha256:a1b2c3d4...' },
+          { cls: 'prompt', text: '$ cosign sign --key cosign.key myapp:1.4.2' },
+          { cls: 'success', text: '- Image signed with Sigstore/Cosign' },
+          { cls: 'info', text: 'Attestation recorded to Rekor transparency log' },
+          { cls: 'success', text: '- Build artefact pushed to registry with provenance.' }
+        ]
+      },
+      {
+        label: 'DAST',
+        status: ' DAST — OWASP ZAP active scan',
+        lines: [
+          { cls: 'prompt', text: '$ zap-full-scan.py -t https://staging.myapp.internal' },
+          { cls: 'info', text: 'Spidering application... 63 URLs discovered' },
+          { cls: 'info', text: 'Running active attack rules...' },
+          { cls: 'warning', text: ' Missing Content-Security-Policy header' },
+          { cls: 'warning', text: ' Cookie without Secure flag on /session' },
+          { cls: 'success', text: '- No critical DAST findings. 2 medium findings filed to backlog.' }
+        ]
+      },
+      {
+        label: 'Deploy',
+        status: '- Secure Deployment — all gates passed',
+        lines: [
+          { cls: 'prompt', text: '$ kubectl apply -f k8s/production/' },
+          { cls: 'info', text: 'Verifying image signature via Gatekeeper policy...' },
+          { cls: 'success', text: '- Signature verified — image approved' },
+          { cls: 'info', text: 'Applying Pod Security Standards (restricted)...' },
+          { cls: 'success', text: '- Deployment complete: myapp 1.4.2 - production (3 replicas)' },
+          { cls: 'success', text: ' All security gates passed. Shipping with confidence!' }
+        ]
+      }
+    ];
+
+    function runPipelineStage(idx) {
+      // Mark active visually
+      document.querySelectorAll('.pipeline-step').forEach(function(s) { s.classList.remove('active'); });
+      document.getElementById('ps' + idx).classList.add('active');
+
+      // Update status bar
+      document.getElementById('pipelineStatus').textContent = pipelineData[idx].status;
+
+      // Render terminal output
+      var out = document.getElementById('terminalOutput');
+      out.innerHTML = '';
+      pipelineData[idx].lines.forEach(function(l) {
+        var span = document.createElement('span');
+        span.className = 'terminal-line ' + l.cls;
+        span.textContent = l.text;
+        out.appendChild(span);
+      });
+
+      // Track explored
+      if (!gameState.stagesExplored.has(idx)) {
+        gameState.stagesExplored.add(idx);
+        var count = gameState.stagesExplored.size;
+        document.getElementById('stageCount').textContent = count;
+        document.getElementById('pipelineBar').style.width = (count / 7 * 100) + '%';
+        if (count === 7) {
+          document.getElementById('pipelineContinue').style.display = 'inline-flex';
+          showAchievement('', 'Pipeline Master!', 'Full CI/CD security pipeline explored!');
+        }
+      }
+    }
+
+    // --- Quiz (Slide 8) --------------------------------------------------------
+    function answerQuiz(qNum, letter, isCorrect) {
+      if (gameState.quizAnswers[qNum] !== undefined) return; // Already answered
+      gameState.quizAnswers[qNum] = { letter: letter, correct: isCorrect };
+
+      var qqEl = document.getElementById('qq' + qNum);
+      var options = qqEl.querySelectorAll('.quiz-option');
+      options.forEach(function(opt) { opt.classList.add('disabled'); });
+
+      var clicked = null;
+      options.forEach(function(opt) {
+        if (opt.querySelector('.quiz-letter').textContent === letter) clicked = opt;
+      });
+
+      var fbEl = document.getElementById('qfb' + qNum);
+      fbEl.style.display = 'block';
+
+      if (isCorrect) {
+        if (clicked) clicked.classList.add('correct');
+        fbEl.className = 'feedback correct';
+        var msgs = {
+          1: '- Correct! STRIDE is the most widely used threat modeling framework and maps directly to security control categories.',
+          2: '- Correct! A CVSS 9.8 vulnerability is critical and demands immediate remediation — delaying creates unacceptable risk.',
+          3: '- Correct! SAST analyses code without executing it, making it ideal for early detection in the developer\'s IDE or CI pipeline.',
+          4: '- Correct! An SBOM (Software Bill of Materials) provides complete visibility into the software supply chain.'
+        };
+        fbEl.textContent = msgs[qNum];
+        gameState.quizScore++;
+      } else {
+        if (clicked) clicked.classList.add('incorrect');
+        // Reveal correct option
+        options.forEach(function(opt) {
+          var optLetter = opt.querySelector('.quiz-letter').textContent;
+          var correctLetters = { 1: 'B', 2: 'C', 3: 'C', 4: 'B' };
+          if (optLetter === correctLetters[qNum]) opt.classList.add('correct');
+        });
+        fbEl.className = 'feedback incorrect';
+        var wrongMsgs = {
+          1: '- Not quite. PASTA is risk-centric, DREAD is a scoring model, LINDDUN is privacy-focused. STRIDE is the correct answer.',
+          2: '- Incorrect. A CVSS 9.8 is critical. Delaying or ignoring it leaves the application exposed to active exploitation.',
+          3: '- Not quite. DAST tests a running app, IAST uses agents at runtime. SAST is the static (no-execution) approach.',
+          4: '- Incorrect. A pen test report covers findings, not inventory. An SBOM is the correct document for supply chain visibility.'
+        };
+        fbEl.textContent = wrongMsgs[qNum];
+      }
+
+      // Check if all answered
+      if (Object.keys(gameState.quizAnswers).length === 4) {
+        var scoreEl = document.getElementById('quizScoreDisplay');
+        scoreEl.style.display = 'block';
+        document.getElementById('quizScore').textContent = gameState.quizScore;
+        var summary = document.getElementById('quizFeedbackSummary');
+        if (gameState.quizScore === 4) {
+          summary.innerHTML = '<div class="feedback correct" style="display:block;"> Perfect score! Outstanding SSDLC knowledge — you\'re ready for the capstone project.</div>';
+          showAchievement('', 'SSDLC Expert!', 'Perfect quiz score!');
+        } else if (gameState.quizScore >= 2) {
+          summary.innerHTML = '<div class="feedback warning" style="display:block;"> Good effort! Review the phases for any questions you missed, then continue to the capstone.</div>';
+        } else {
+          summary.innerHTML = '<div class="feedback incorrect" style="display:block;"> Please revisit the SSDLC phases before proceeding. Security knowledge is critical for the capstone.</div>';
+        }
+        document.getElementById('quizContinue').style.display = 'inline-flex';
+        document.getElementById('finalScore').textContent = Math.round((gameState.quizScore / 4) * 100) + '%';
+      }
+    }
+
+    // --- Capstone (Slide 9) ----------------------------------------------------
+    function markCapstone(idx) {
+      if (gameState.capstonePhases.has(idx)) {
+        // Toggle off if needed — allow re-clicking to feel responsive
+        return;
+      }
+      gameState.capstonePhases.add(idx);
+      var el = document.getElementById('cp' + idx);
+      if (el) el.classList.add('done');
+
+      var count = gameState.capstonePhases.size;
+      document.getElementById('capstoneCount').textContent = count;
+      document.getElementById('capstoneBar').style.width = (count / 8 * 100) + '%';
+
+      if (count === 4) showAchievement('', 'Halfway There!', 'Four capstone phases complete!');
+      if (count === 8) {
+        document.getElementById('capstoneContinue').style.display = 'inline-flex';
+        document.getElementById('capstoneFeedback').innerHTML = '<div class="feedback correct" style="display:block;"> Capstone project complete! You\'ve applied every SSDLC phase from requirements to remediation. Outstanding work!</div>';
+        showAchievement('', 'SSDLC Architect!', 'Full capstone project completed!');
+      }
+    }
+
+    // --- Complete Module -------------------------------------------------------
+    function completeModule() {
+      gameState.moduleCompleted = true;
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'moduleComplete', score: 100 }, '*');
+      }
+    }
+
+    // --- Owl Easter Egg --------------------------------------------------------
+    function owlClick() {
+      var owl = document.querySelector('.grc-owl');
+      owl.style.animation = 'none';
+      setTimeout(function() { owl.style.animation = 'bounce 2s ease-in-out infinite'; }, 10);
+      if (!gameState.achievements.includes('owl')) {
+        gameState.achievements.push('owl');
+        showAchievement('', 'Wise Discovery!', 'You found the easter egg!');
+      }
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'goHome' }, '*');
+      }
+    }
+
+    // --- Init ------------------------------------------------------------------
+    window.onload = function() {
+      var urlParams = new URLSearchParams(window.location.search);
+var reviewMode = urlParams.get('reviewMode');
+      if (reviewMode === 'true') {
+        gameState.moduleCompleted = true;
+      }
+
+      var resumeSlide = urlParams.get('slide');
+      if (resumeSlide && !isNaN(resumeSlide)) {
+        showSlide(parseInt(resumeSlide));
+      }
+
+      updateProgress();
+    };
+
+    window.addEventListener('message', function(e) {
+      if (e.data && e.data.type === 'navigate') {
+        if (e.data.slide) showSlide(e.data.slide);
+      }
+    });
+  </script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
+

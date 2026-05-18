@@ -1,0 +1,450 @@
+﻿/* Shared Modern UI Theme for GRC Training */
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&display=swap');
+
+:root {
+  --brand-900: #08152d;
+  --brand-800: #0f2550;
+  --brand-700: #163f86;
+  --brand-600: #2563eb;
+  --brand-500: #3b82f6;
+  --brand-400: #60a5fa;
+  --brand-300: #93c5fd;
+  --brand-200: #bfdbfe;
+  --brand-100: #eaf2ff;
+
+  --accent-700: #0f766e;
+  --accent-600: #0d9488;
+  --accent-500: #14b8a6;
+  --accent-300: #7dd3c7;
+  --accent-100: #e6fffb;
+
+  --surface-0: #f3f7ff;
+  --surface-1: #ffffff;
+  --surface-2: #edf3fb;
+  --surface-3: #d7e2f2;
+
+  --text-900: #0f172a;
+  --text-700: #24324a;
+  --text-500: #55647d;
+
+  --ok-600: #16a34a;
+  --warn-600: #d97706;
+  --danger-600: #dc2626;
+
+  --shadow-soft: 0 10px 28px rgba(15, 37, 80, 0.10);
+  --shadow-strong: 0 18px 56px rgba(8, 24, 56, 0.22);
+  --ring: 0 0 0 3px rgba(37, 99, 235, 0.20);
+
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+
+  --primary-purple: var(--brand-600);
+  --light-purple: var(--brand-100);
+  --dark-purple: var(--brand-800);
+  --primary-teal: var(--accent-600);
+  --light-teal: var(--accent-100);
+  --dark-teal: var(--accent-700);
+  --primary-blue: var(--brand-600);
+  --light-blue: var(--brand-100);
+  --dark-blue: var(--brand-800);
+  --accent-blue: var(--brand-500);
+  --light-accent: var(--accent-100);
+  --dark-accent: var(--accent-700);
+  --off-black: var(--text-900);
+  --primary-off-black: var(--text-900);
+  --white: var(--surface-1);
+  --primary-white: var(--surface-1);
+  --success-green: var(--ok-600);
+  --warning-amber: var(--warn-600);
+  --error-red: var(--danger-600);
+  --neutral-gray: var(--text-500);
+  --light-gray: var(--surface-0);
+  --medium-gray: var(--surface-3);
+  --primary-gradient: linear-gradient(135deg, var(--brand-700) 0%, var(--brand-500) 52%, var(--accent-700) 100%);
+}
+
+body.modern-theme {
+  font-family: 'Manrope', 'Segoe UI', Roboto, Arial, 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  color: var(--text-900);
+}
+
+/* Fluid layout for module pages loaded in iframe or standalone */
+body.modern-theme.module-app {
+  margin: 0 !important;
+  padding: 0 !important;
+  min-height: 100vh !important;
+  display: block !important;
+}
+
+body.modern-theme::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(860px 520px at 8% 8%, rgba(59, 130, 246, 0.14), transparent 62%),
+    radial-gradient(720px 470px at 92% 10%, rgba(13, 148, 136, 0.12), transparent 66%),
+    radial-gradient(760px 500px at 50% 100%, rgba(37, 99, 235, 0.10), transparent 65%),
+    linear-gradient(160deg, #f4f8ff 0%, #eef4ff 36%, #ebf3ff 100%);
+  z-index: -2;
+  pointer-events: none;
+}
+
+.modern-theme *:focus-visible {
+  outline: none;
+  box-shadow: var(--ring);
+}
+
+.modern-theme .sidebar {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(10px);
+  border-right: 1px solid rgba(17, 63, 126, 0.08);
+  box-shadow: 8px 0 36px rgba(16, 42, 86, 0.10);
+}
+
+.modern-theme .sidebar-header {
+  background: var(--primary-gradient);
+  position: relative;
+}
+
+.modern-theme .sidebar-header::after {
+  content: '';
+  position: absolute;
+  inset: auto -20% -55% -20%;
+  height: 140px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.22), transparent 70%);
+}
+
+.modern-theme .sidebar-toggle {
+  background: var(--primary-gradient);
+  box-shadow: 0 8px 20px rgba(16, 42, 86, 0.22);
+}
+
+.modern-theme .module-item {
+  border: 1px solid rgba(16, 42, 86, 0.12);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
+
+.modern-theme .module-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(41, 115, 201, 0.4);
+  box-shadow: 0 16px 34px rgba(16, 42, 86, 0.15);
+}
+
+.modern-theme .module-item.active {
+  border-color: var(--brand-500);
+  background: linear-gradient(180deg, #f2f8ff 0%, #ebf4ff 100%);
+}
+
+.modern-theme .module-name {
+  font-family: 'Space Grotesk', 'Manrope', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  letter-spacing: 0.2px;
+}
+
+.modern-theme .module-status {
+  border: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+}
+
+.modern-theme .home-screen {
+  background:
+    radial-gradient(900px 540px at 15% 5%, rgba(59, 130, 246, 0.30), transparent 65%),
+    radial-gradient(700px 460px at 85% 0%, rgba(13, 148, 136, 0.24), transparent 65%),
+    linear-gradient(160deg, #08152d 0%, #102a56 48%, #134074 100%);
+}
+
+.modern-theme .home-title,
+.modern-theme .transition-title {
+  font-family: 'Space Grotesk', 'Manrope', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  letter-spacing: 0.4px;
+}
+
+.modern-theme .home-title {
+  color: #f3f8ff;
+  text-shadow: 0 6px 20px rgba(4, 14, 32, 0.45);
+}
+
+.modern-theme .home-subtitle,
+.modern-theme .transition-message {
+  color: rgba(235, 245, 255, 0.95);
+}
+
+.modern-theme .module-card {
+  border-radius: 18px;
+  border: 1px solid rgba(16, 42, 86, 0.14);
+  box-shadow: 0 18px 34px rgba(8, 28, 62, 0.16);
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+}
+
+.modern-theme .module-card:hover {
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 22px 40px rgba(8, 28, 62, 0.23);
+}
+
+.modern-theme .module-card-title {
+  font-family: 'Space Grotesk', 'Manrope', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  color: var(--brand-800);
+}
+
+.modern-theme .module-card-description,
+.modern-theme .progress-text {
+  color: var(--text-500);
+}
+
+.modern-theme .progress-bar {
+  background: #dbe7f8;
+  border-radius: 999px;
+}
+
+.modern-theme .progress-fill {
+  background: linear-gradient(90deg, var(--brand-600), var(--accent-600));
+  border-radius: 999px;
+  box-shadow: 0 0 12px rgba(41, 115, 201, 0.35);
+}
+
+.modern-theme .transition-screen,
+.modern-theme .loading-overlay {
+  background:
+    radial-gradient(850px 540px at 15% 4%, rgba(59, 130, 246, 0.30), transparent 65%),
+    radial-gradient(760px 460px at 90% 0%, rgba(13, 148, 136, 0.24), transparent 65%),
+    linear-gradient(160deg, #08152d 0%, #102a56 50%, #134074 100%);
+}
+
+.modern-theme .transition-button,
+.modern-theme .btn,
+.modern-theme button[class*='btn'] {
+  border-radius: 12px;
+  border: 1px solid #1a3276;
+  background: #1e3a8a;
+  box-shadow: 0 10px 20px rgba(15, 37, 80, 0.22);
+  color: #fff;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.modern-theme .transition-button:hover,
+.modern-theme .btn:hover,
+.modern-theme button[class*='btn']:hover {
+  background: #1b347d;
+  transform: translateY(-2px);
+  box-shadow: 0 14px 24px rgba(15, 37, 80, 0.28);
+}
+
+.modern-theme .transition-button:active,
+.modern-theme .btn:active,
+.modern-theme button[class*='btn']:active {
+  transform: translateY(0);
+}
+
+.modern-theme .btn-secondary,
+.modern-theme .transition-button.secondary,
+.modern-theme button[class*='secondary'] {
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--brand-700);
+  border: 1px solid rgba(16, 42, 86, 0.18);
+  box-shadow: none;
+}
+
+.modern-theme .btn-secondary:hover,
+.modern-theme .transition-button.secondary:hover,
+.modern-theme button[class*='secondary']:hover {
+  background: #fff;
+  color: var(--brand-800);
+  box-shadow: var(--shadow-soft);
+}
+
+.modern-theme .module-container {
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(16, 42, 86, 0.12);
+  box-shadow: var(--shadow-strong);
+  background: linear-gradient(180deg, #ffffff 0%, #f9fbff 100%);
+}
+
+body.modern-theme.module-app .module-container {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 100vh !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-left: none;
+  border-right: none;
+  box-shadow: none;
+}
+
+body.modern-theme.module-app .grc-header {
+  border-radius: 0 !important;
+}
+
+.modern-theme .grc-header {
+  background: var(--primary-gradient);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.modern-theme .grc-logo {
+  font-family: 'Space Grotesk', 'Manrope', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  font-weight: 600;
+}
+
+.modern-theme .grc-owl {
+  background: linear-gradient(180deg, #ffffff 0%, #edf4ff 100%);
+  box-shadow: 0 6px 18px rgba(7, 28, 58, 0.2);
+}
+
+.modern-theme .slide {
+  border-top: 1px solid rgba(16, 42, 86, 0.06);
+  background:
+    radial-gradient(520px 260px at 15% 0%, rgba(198, 222, 252, 0.22), transparent 70%),
+    linear-gradient(180deg, #ffffff 0%, #fbfdff 100%);
+}
+
+.modern-theme .slide h1,
+.modern-theme .slide h2,
+.modern-theme .reset-modal-title {
+  font-family: 'Space Grotesk', 'Manrope', 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', sans-serif;
+  color: var(--brand-800);
+}
+
+.modern-theme .slide h1 {
+  text-shadow: none;
+}
+
+/* Force readable text even if legacy page CSS tries gradient+transparent text fill */
+.modern-theme .slide h1,
+.modern-theme .slide h2,
+.modern-theme .home-title,
+.modern-theme .transition-title {
+  background: none !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Guard against inline style mojibake remnants that set transparent text fill */
+.modern-theme [style*='-webkit-text-fill-color: transparent'] {
+  -webkit-text-fill-color: currentColor !important;
+  -webkit-background-clip: border-box !important;
+  background-clip: border-box !important;
+}
+
+/* Ensure all emoji/icon glyphs render via emoji-capable fallbacks */
+.modern-theme .grc-owl,
+.modern-theme .module-icon,
+.modern-theme .module-card-icon,
+.modern-theme .info-card-icon {
+  font-family: 'Segoe UI Emoji', 'Apple Color Emoji', 'Noto Color Emoji', 'Segoe UI Symbol', sans-serif !important;
+  font-style: normal;
+}
+
+.modern-theme .slide p,
+.modern-theme .slide li,
+.modern-theme .attestation-content p,
+.modern-theme .reset-modal-message {
+  color: var(--text-700);
+}
+
+.modern-theme .info-card,
+.modern-theme .welcome-card,
+.modern-theme .visual-demo,
+.modern-theme .policy-link-box,
+.modern-theme .attestation-form,
+.modern-theme .reset-modal-content {
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(16, 42, 86, 0.12);
+  box-shadow: var(--shadow-soft);
+  background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+}
+
+.modern-theme .navigation {
+  border-top: 1px solid rgba(16, 42, 86, 0.10);
+}
+
+.modern-theme .policy-attestation,
+.modern-theme .welcome-screen,
+.modern-theme #welcomeScreen {
+  background:
+    radial-gradient(900px 540px at 12% 5%, rgba(59, 130, 246, 0.26), transparent 65%),
+    radial-gradient(740px 460px at 90% 0%, rgba(13, 148, 136, 0.22), transparent 65%),
+    linear-gradient(160deg, #08152d 0%, #102a56 50%, #134074 100%);
+}
+
+.modern-theme .attestation-container,
+.modern-theme .grc-logo-header {
+  border-radius: 18px;
+}
+
+.modern-theme input[type='text'],
+.modern-theme input[type='email'],
+.modern-theme input[type='password'],
+.modern-theme textarea,
+.modern-theme select {
+  border-radius: 10px;
+  border: 1px solid rgba(16, 42, 86, 0.22);
+  background: #fff;
+  color: var(--text-900);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.modern-theme input[type='text']:focus,
+.modern-theme input[type='email']:focus,
+.modern-theme input[type='password']:focus,
+.modern-theme textarea:focus,
+.modern-theme select:focus {
+  border-color: var(--brand-500);
+  box-shadow: var(--ring);
+}
+
+.modern-theme .certificate,
+.modern-theme .certificate-card,
+.modern-theme [id*='certificate'],
+.modern-theme [id*='Certificate'] {
+  border-radius: 18px;
+}
+
+@media (max-width: 900px) {
+  .modern-theme .module-container {
+    border-radius: 14px;
+  }
+
+  .modern-theme .slide {
+    padding: 36px 26px;
+    min-height: 500px;
+  }
+
+  .modern-theme .home-title {
+    font-size: 38px;
+  }
+
+  .modern-theme .home-subtitle {
+    font-size: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .modern-theme .module-card {
+    border-radius: 14px;
+  }
+
+  .modern-theme .sidebar {
+    background: rgba(255, 255, 255, 0.96);
+  }
+
+  .modern-theme .grc-header,
+  .modern-theme .sidebar-header {
+    padding: 18px;
+  }
+
+  .modern-theme .slide {
+    padding: 30px 18px;
+  }
+
+  .modern-theme .transition-button,
+  .modern-theme .btn {
+    width: 100%;
+    justify-content: center;
+    margin: 8px 0;
+  }
+}
+

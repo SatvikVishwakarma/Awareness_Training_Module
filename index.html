@@ -1,0 +1,2861 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRC Engineering: Cybersecurity & Privacy Training</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    :root {
+      /* Modern Professional Blue Theme */
+      --primary-blue:#2563eb; --light-blue:#eaf2ff; --dark-blue:#0f2550;
+      --accent-blue:#0d9488; --light-accent:#e6fffb; --dark-accent:#115e59;
+      --off-black:#0f172a; --white:#FFFFFF; --success-green:#16a34a;
+      --warning-amber:#d97706; --error-red:#dc2626; --neutral-gray:#55647d;
+      --light-gray:#f3f7ff; --medium-gray:#d7e2f2;
+      /* Legacy variable mappings */
+      --primary-purple: var(--primary-blue); --light-purple: var(--light-blue); --dark-purple: var(--dark-blue);
+      --primary-teal: var(--accent-blue); --light-teal: var(--light-accent); --dark-teal: var(--dark-accent);
+    }
+    
+    body { 
+      font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;
+      margin: 0;
+      padding: 0;
+      background: var(--light-gray);
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Hide all scrollbar UI while preserving scroll behavior */
+    html, body, * {
+      scrollbar-width: none;      /* Firefox */
+      -ms-overflow-style: none;   /* IE and legacy Edge */
+    }
+
+    *::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;              /* Chromium/Safari */
+      background: transparent;
+    }
+    
+    /* Sidebar Navigation */
+    .sidebar {
+      width: 280px;
+      background: white;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      position: relative;
+      transition: margin-left 0.3s ease;
+    }
+    
+    .sidebar.collapsed {
+      margin-left: -280px; /* Fully hide the sidebar */
+    }
+    
+    .sidebar-toggle {
+      position: fixed; /* Changed to fixed so it stays visible */
+      left: 280px; /* Position at edge of sidebar */
+      top: 20px;
+      width: 30px;
+      height: 40px;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-teal) 100%);
+      color: white;
+      border: none;
+      border-radius: 0 8px 8px 0;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      z-index: 101;
+      transition: all 0.3s ease;
+    }
+    
+    .sidebar.collapsed ~ .sidebar-toggle,
+    .sidebar-toggle.collapsed {
+      left: 0; /* Move button to left edge when collapsed */
+    }
+    
+    .sidebar-toggle:hover {
+      background: var(--dark-purple);
+    }
+    
+    .sidebar-header {
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-teal) 100%);
+      color: white;
+      padding: 24px;
+      text-align: center;
+    }
+    
+    .sidebar-logo {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 18px;
+      cursor: pointer;
+      padding: 10px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.25);
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .sidebar-logo:hover {
+      transform: translateY(-1px);
+      background: rgba(255,255,255,0.2);
+      box-shadow: 0 8px 20px rgba(5, 24, 66, 0.2);
+    }
+
+    .sidebar-logo-img {
+      width: 112px;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      filter: drop-shadow(0 4px 10px rgba(9, 36, 82, 0.2));
+    }
+
+    .sidebar-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .grc-owl {
+      width: 48px;
+      height: 48px;
+      background: transparent;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    
+    .sidebar-title {
+      font-size: 18px;
+      font-weight: 700;
+    }
+    
+    .home-button {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      background: rgba(255,255,255,0.18);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.38);
+      padding: 12px 16px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.22),
+        0 8px 18px rgba(8, 31, 77, 0.16);
+    }
+    
+    .home-button:hover {
+      background: rgba(255,255,255,0.28);
+      transform: translateY(-1px);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.26),
+        0 10px 22px rgba(8, 31, 77, 0.22);
+    }
+
+    .home-button:active {
+      transform: translateY(0);
+    }
+
+    .home-button-icon {
+      font-size: 16px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .home-button-danger {
+      background: linear-gradient(135deg, #ef4444 0%, #c81e1e 100%);
+      border-color: rgba(255,255,255,0.25);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.2),
+        0 10px 22px rgba(124, 15, 24, 0.35);
+    }
+
+    .home-button-danger:hover {
+      background: linear-gradient(135deg, #f35b5b 0%, #d12626 100%);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,0.24),
+        0 12px 26px rgba(124, 15, 24, 0.4);
+    }
+    
+    .module-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      -ms-overflow-style: none; /* IE and legacy Edge */
+      scrollbar-width: none; /* Firefox */
+    }
+
+    .module-list::-webkit-scrollbar {
+      display: none; /* Chrome, Safari, Opera */
+    }
+    
+    .module-item {
+      background: white;
+      border: 2px solid var(--medium-gray);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+    
+    .module-item:hover {
+      border-color: var(--primary-blue);
+      box-shadow: 0 4px 12px rgba(30,64,175,0.15);
+    }
+    
+    .module-item.active {
+      border-color: var(--primary-blue);
+      background: var(--light-blue);
+    }
+    
+    .module-item.completed {
+      border-color: var(--success-green);
+    }
+
+    .module-item.disabled {
+      opacity: 0.5;
+      pointer-events: none;
+      filter: grayscale(0.25);
+      border-style: dashed;
+    }
+    
+    .module-title-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    
+    .module-title-content {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+    }
+    
+    .module-icon {
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+    
+    .module-name {
+      font-weight: 600;
+      color: var(--dark-blue);
+      flex: 1;
+    }
+    
+    .module-status {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--medium-gray);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      min-width: 24px;
+      min-height: 24px;
+    }
+    
+    .module-status.in-progress {
+      background: var(--warning-amber);
+      color: white;
+    }
+    
+    .module-status.in-progress::after {
+      content: '\2022';
+      font-size: 16px;
+    }
+    
+    .module-status.completed {
+      background: var(--success-green);
+      color: white;
+    }
+    
+    .module-status.completed::after {
+      content: '✓';
+      font-weight: bold;
+    }
+    
+    .module-progress {
+      margin-top: 8px;
+    }
+    
+    .progress-bar {
+      height: 4px;
+      background: var(--medium-gray);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-teal) 100%);
+      transition: width 0.5s ease;
+    }
+    
+    .progress-text {
+      font-size: 12px;
+      color: var(--neutral-gray);
+      margin-top: 4px;
+    }
+    
+    /* Main Content Area */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      background: var(--light-gray);
+      position: relative;
+    }
+    
+    .content-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-teal) 100%);
+    }
+    
+    .loading-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--dark-purple) 100%);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    
+    .loading-overlay.show {
+      display: flex;
+    }
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid rgba(255, 255, 255, 0.3);
+      border-top: 4px solid white;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Home Screen */
+    .home-screen {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      height: 100%;
+      padding: 40px;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: white;
+      text-align: center;
+      overflow-y: auto;
+    }
+    
+    .home-title {
+      font-size: 48px;
+      font-weight: 700;
+      margin-top: 20px;
+      margin-bottom: 24px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .home-subtitle {
+      font-size: 24px;
+      margin-bottom: 32px;
+      opacity: 0.95;
+    }
+    
+    .module-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      max-width: 1000px;
+      width: 100%;
+      margin-bottom: 40px;
+    }
+    
+    .module-card {
+      background: white;
+      color: var(--dark-blue);
+      padding: 24px;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      min-height: 180px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .module-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+    }
+
+    .module-card.disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(0.35);
+      box-shadow: none;
+    }
+
+    .portal-lock-screen {
+      position: absolute;
+      inset: 0;
+      z-index: 4000;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.08), transparent 40%), linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      color: #fff;
+      padding: 24px;
+      text-align: center;
+    }
+
+    .portal-lock-screen.show {
+      display: flex;
+    }
+
+    .portal-lock-card {
+      max-width: 640px;
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 16px;
+      padding: 32px;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.35);
+      backdrop-filter: blur(6px);
+    }
+    
+    .module-card-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+    }
+    
+    .module-card-title {
+      font-size: 20px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+    
+    .module-card-description {
+      font-size: 14px;
+      color: var(--neutral-gray);
+    }
+    
+    /* Module Transition Screen */
+    .transition-screen {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--dark-purple) 100%);
+      color: white;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 1000;
+    }
+    
+    .transition-screen.show {
+      display: flex;
+    }
+    
+    .transition-content {
+      text-align: center;
+      animation: fadeInUp 0.8s ease;
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+    
+    .transition-icon {
+      font-size: 80px;
+      margin-bottom: 24px;
+    }
+    
+    .transition-title {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+    
+    .transition-message {
+      font-size: 20px;
+      opacity: 0.9;
+      margin-bottom: 32px;
+    }
+    
+    .transition-button {
+      background: white;
+      color: var(--primary-blue);
+      padding: 16px 32px;
+      border: none;
+      border-radius: 8px;
+      font-size: 18px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 8px;
+    }
+    
+    .transition-button:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 20px rgba(255,255,255,0.3);
+    }
+    
+    .transition-button.secondary {
+      background: transparent;
+      color: white;
+      border: 2px solid white;
+    }
+    
+    .transition-button.secondary:hover {
+      background: rgba(255,255,255,0.1);
+    }
+    
+    /* Policy Attestation Styles */
+    .policy-attestation {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+      padding: 20px;
+      overflow: hidden;
+      z-index: 2000;
+    }
+    
+    .attestation-container {
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      max-width: 960px;
+      width: 100%;
+      height: fit-content;
+      max-height: 95vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .grc-logo-header {
+      background: white;
+      color: var(--dark-blue);
+      padding: 28px 24px;
+      text-align: center;
+      flex-shrink: 0;
+    }
+
+    .grc-logo-header .grc-header-logo {
+      width: auto;
+      max-height: 112px;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 8px 18px rgba(10, 36, 84, 0.2));
+    }
+    
+    .grc-logo-header h1 {
+      margin: 14px 0 0 0;
+      font-size: 46px;
+      line-height: 1.05;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+    
+    .attestation-content {
+      padding: 30px 40px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .attestation-content h2 {
+      color: var(--dark-blue);
+      margin: 0 0 16px 0;
+      font-size: 24px;
+    }
+    
+    .policy-info {
+      margin-bottom: 20px;
+      flex: 1;
+    }
+    
+    .policy-info p {
+      color: var(--neutral-gray);
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    
+    .policy-link-box {
+      background: var(--light-gray);
+      border: 2px solid var(--light-blue);
+      border-radius: 12px;
+      padding: 18px;
+      margin: 16px 0;
+    }
+    
+    .policy-link-box h3 {
+      color: var(--dark-blue);
+      margin: 0 0 12px 0;
+      font-size: 18px;
+    }
+
+    .welcome-content {
+      gap: 16px;
+    }
+
+    #welcomeScreen .attestation-container {
+      max-width: 860px;
+    }
+
+    #welcomeScreen .grc-logo-header {
+      padding: 24px 20px;
+    }
+
+    #welcomeScreen .grc-logo-header h1 {
+      font-size: 38px;
+      margin-top: 10px;
+    }
+
+    #welcomeScreen .attestation-content {
+      padding: 26px 32px 30px;
+    }
+
+    .welcome-heading {
+      text-align: center;
+      font-size: 34px;
+      line-height: 1.1;
+      margin: 0;
+      letter-spacing: -0.03em;
+      color: var(--dark-blue);
+    }
+
+    .welcome-overview-card {
+      padding: 22px 22px 20px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #ffffff 0%, #f7fbff 100%);
+      border: 1px solid rgba(16, 42, 86, 0.14);
+      box-shadow: 0 8px 22px rgba(10, 36, 84, 0.08);
+    }
+
+    .welcome-overview-card h3 {
+      margin: 0;
+      color: var(--dark-blue);
+      font-size: 23px;
+      letter-spacing: -0.01em;
+    }
+
+    .welcome-overview-card p {
+      margin: 10px 0 0 0;
+      color: #4f617e;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .welcome-credit-card {
+      border-radius: 14px;
+      border: 1px solid rgba(16, 42, 86, 0.14);
+      background: #fff;
+      box-shadow: 0 8px 18px rgba(10, 36, 84, 0.06);
+      padding: 16px 18px;
+      width: 100%;
+      max-width: none;
+    }
+
+    .welcome-credit-label {
+      display: block;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-size: 12px;
+      font-weight: 700;
+      color: #64748b;
+    }
+
+    .welcome-credit-name {
+      margin: 0;
+      color: var(--dark-blue);
+      font-size: 16px;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+    }
+
+    .welcome-cta {
+      margin-top: 0;
+      width: 100%;
+      max-width: none;
+      padding: 0;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      border-radius: 0;
+    }
+
+    .welcome-cta .attest-button {
+      margin-top: 0;
+      width: 100%;
+      min-height: 56px;
+      font-size: 19px;
+      border-radius: 12px;
+    }
+
+    .employee-content {
+      gap: 10px;
+    }
+
+    .employee-header {
+      margin-bottom: 6px;
+    }
+
+    .employee-header h2 {
+      font-size: 34px;
+      margin: 0 0 8px 0;
+      letter-spacing: -0.03em;
+    }
+
+    .employee-header p {
+      font-size: 18px;
+      color: var(--neutral-gray);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .policy-link {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(135deg, var(--primary-purple) 0%, var(--primary-teal) 100%);
+      color: white;
+      text-decoration: none;
+      padding: 12px 20px;
+      border-radius: 8px;
+      margin: 14px 0;
+      transition: all 0.3s ease;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    
+    .policy-link:hover {
+      background: var(--dark-blue);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(30,64,175,0.3);
+    }
+    
+    .link-icon {
+      font-size: 24px;
+    }
+    
+    .link-text {
+      flex: 1;
+    }
+    
+    .link-arrow {
+      font-size: 20px;
+      transition: transform 0.3s ease;
+    }
+    
+    .policy-link:hover .link-arrow {
+      transform: translateX(5px);
+    }
+    
+    .policy-categories {
+      margin-top: 16px;
+    }
+    
+    .policy-categories p {
+      margin: 12px 0 8px 0;
+      font-weight: 600;
+      color: var(--dark-blue);
+      font-size: 14px;
+    }
+    
+    .policy-categories ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .policy-categories li {
+      padding: 5px 0;
+      color: var(--neutral-gray);
+      font-size: 14px;
+    }
+    
+    .attestation-form {
+      background: #f8f8f8;
+      border-top: 2px solid #e0e0e0;
+      padding: 20px 35px;
+      flex-shrink: 0;
+    }
+    
+    .checkbox-container {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 15px;
+    }
+    
+    .checkbox-container input[type="checkbox"] {
+      margin-top: 2px;
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    
+    .checkbox-container label {
+      flex: 1;
+      color: #333;
+      font-size: 15px;
+      line-height: 1.4;
+      cursor: pointer;
+    }
+    
+    .attest-info {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 10px 14px;
+      margin: 15px 0;
+      border-radius: 4px;
+    }
+    
+    .attest-info p {
+      margin: 0;
+      color: #856404;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+    
+    .attest-button {
+      width: 100%;
+      padding: 14px 28px;
+      background: var(--success-green);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 17px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 15px;
+    }
+    
+    .attest-button:not(:disabled):hover {
+      background: #15803D;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(76,175,80,0.3);
+    }
+    
+    .attest-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    .employee-form {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      color: var(--dark-blue);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 15px 18px;
+      border: 1px solid var(--medium-gray);
+      border-radius: 8px;
+      font-size: 16px;
+      color: var(--dark-blue);
+      background: white;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: var(--primary-blue);
+      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.15);
+      outline: none;
+    }
+
+    .employee-form-note {
+      margin: 4px 0 0 0;
+      color: var(--neutral-gray);
+      font-size: 14px;
+    }
+
+    .employee-form {
+      gap: 16px;
+    }
+
+    .employee-form .attest-button {
+      margin-top: 8px;
+    }
+
+    /* Reset Confirmation Modal */
+    .reset-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 3000;
+      transition: background 0.3s ease;
+    }
+
+    .reset-modal.show {
+      display: flex;
+    }
+
+    .reset-modal.animate-in {
+      background: rgba(0, 0, 0, 0.7);
+    }
+
+    .reset-modal-content {
+      background: white;
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      transform: scale(0.7);
+      opacity: 0;
+      transition: all 0.3s ease;
+    }
+
+    .reset-modal-content.animate-in {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    .reset-modal-icon {
+      font-size: 64px;
+      margin-bottom: 20px;
+    }
+
+    .reset-modal-title {
+      color: var(--dark-blue);
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 16px;
+    }
+
+    .reset-modal-message {
+      color: var(--neutral-gray);
+      font-size: 16px;
+      line-height: 1.5;
+      margin-bottom: 32px;
+    }
+
+    .reset-modal-buttons {
+      display: flex;
+      gap: 12px;
+      justify-content: center;
+    }
+
+    .reset-modal-button {
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+    }
+
+    .reset-modal-button.cancel {
+      background: var(--medium-gray);
+      color: #333;
+    }
+
+    .reset-modal-button.cancel:hover {
+      background: #d0d0d0;
+    }
+
+    .reset-modal-button.confirm {
+      background: linear-gradient(135deg, #DC2626 0%, #c62828 100%);
+      color: white;
+    }
+
+    .reset-modal-button.confirm:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(244, 67, 54, 0.3);
+    }
+
+    /* Responsive */
+    /* Mobile Responsive Styles */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      /* Sidebar adjustments for mobile */
+      .sidebar {
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: auto;
+        max-height: 60vh;
+        z-index: 1000;
+        transform: translateY(-100%);
+        transition: transform 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      }
+
+      .sidebar.collapsed {
+        margin-left: 0;
+        transform: translateY(-100%);
+      }
+
+      .sidebar:not(.collapsed) {
+        transform: translateY(0);
+      }
+
+      .sidebar-toggle {
+        position: fixed;
+        left: auto;
+        right: 20px;
+        top: 20px;
+        z-index: 1001;
+        background: var(--primary-purple);
+        color: white;
+        border-radius: 8px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      }
+
+      .sidebar.collapsed ~ .sidebar-toggle,
+      .sidebar-toggle.collapsed {
+        left: auto;
+        right: 20px;
+      }
+
+      .sidebar-content {
+        overflow-y: auto;
+        max-height: calc(60vh - 100px);
+      }
+
+      /* Main content adjustments */
+      .main-content {
+        width: 100%;
+        margin-left: 0;
+        padding: 70px 0 0 0;
+      }
+
+      /* Policy attestation responsive */
+      .policy-attestation {
+        padding: 20px;
+      }
+
+      .attestation-container {
+        width: 100%;
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+      }
+
+      .grc-logo-header {
+        padding: 22px 18px;
+      }
+
+      .grc-logo-header .grc-header-logo {
+        max-height: 82px;
+      }
+
+      .grc-logo-header h1 {
+        font-size: 32px;
+        margin-top: 12px;
+      }
+
+      .attestation-content {
+        padding: 22px 22px 24px;
+      }
+
+      .attestation-content h2 {
+        font-size: 20px;
+      }
+
+      .welcome-heading {
+        font-size: 29px;
+      }
+
+      .welcome-overview-card,
+      .welcome-credit-card {
+        padding: 18px 18px 16px;
+      }
+
+      .welcome-overview-card h3 {
+        font-size: 21px;
+      }
+
+      .welcome-overview-card p {
+        font-size: 15px;
+      }
+
+      .welcome-credit-name {
+        font-size: 24px;
+      }
+
+      .welcome-cta .attest-button {
+        font-size: 17px;
+        min-height: 52px;
+      }
+
+      #welcomeScreen .attestation-content {
+        padding: 20px 20px 22px;
+      }
+
+      #welcomeScreen .grc-logo-header h1 {
+        font-size: 30px;
+      }
+
+      .employee-header h2 {
+        font-size: 30px;
+      }
+
+      .employee-header p {
+        font-size: 16px;
+      }
+
+      .form-group label {
+        font-size: 15px;
+      }
+
+      .form-input {
+        font-size: 15px;
+        padding: 12px 14px;
+      }
+
+      .employee-form-note {
+        font-size: 13px;
+      }
+
+      .policy-link-box {
+        padding: 16px;
+      }
+
+      .policy-link-box h3 {
+        font-size: 16px;
+      }
+
+      .policy-link-box p, .policy-link-box li {
+        font-size: 13px;
+      }
+
+      /* Module cards responsive */
+      .module-cards {
+        grid-template-columns: 1fr;
+        padding: 20px;
+        gap: 16px;
+      }
+
+      .module-card {
+        padding: 20px;
+      }
+
+      .module-card-icon {
+        font-size: 40px;
+      }
+
+      .module-card-title {
+        font-size: 18px;
+      }
+
+      .module-card-description {
+        font-size: 13px;
+      }
+
+      /* Progress tracking responsive */
+      .progress-tracker {
+        padding: 16px;
+      }
+
+      .module-progress {
+        flex-direction: column;
+        gap: 12px;
+      }
+
+      .module-progress-item {
+        width: 100%;
+      }
+
+      /* Buttons responsive */
+      .home-button, .attest-button {
+        font-size: 14px;
+        padding: 12px 24px;
+      }
+
+      .sidebar-logo-img {
+        width: 98px;
+      }
+
+      /* Popups responsive */
+      .reset-modal-content,
+      #policyPopupContent,
+      #phishingLinkContent,
+      #pluginWarningContent,
+      #passwordWarningContent,
+      #resourcePopupContent {
+        width: 95% !important;
+        max-width: 95% !important;
+        padding: 24px !important;
+      }
+/* Completion banner responsive */
+      .completion-banner {
+        flex-direction: column;
+        padding: 16px;
+        text-align: center;
+      }
+
+      .completion-banner-content {
+        margin-bottom: 12px;
+      }
+
+      .completion-banner h3 {
+        font-size: 18px;
+      }
+
+      .completion-banner p {
+        font-size: 13px;
+      }
+    }
+
+    /* Extra small devices (phones in portrait, less than 480px) */
+    @media (max-width: 480px) {
+      .grc-logo-header .grc-header-logo {
+        max-height: 74px;
+      }
+
+      .grc-logo-header h1 {
+        font-size: 26px;
+      }
+
+      .grc-logo-header span {
+        font-size: 36px !important;
+      }
+
+      .welcome-heading {
+        font-size: 24px;
+      }
+
+      .welcome-overview-card h3 {
+        font-size: 18px;
+      }
+
+      .welcome-overview-card p,
+      .employee-header p {
+        font-size: 15px;
+      }
+
+      .welcome-credit-name {
+        font-size: 21px;
+      }
+
+      .welcome-cta .attest-button {
+        font-size: 16px;
+      }
+
+      #welcomeScreen .grc-logo-header h1 {
+        font-size: 24px;
+      }
+
+      .employee-header h2 {
+        font-size: 26px;
+      }
+
+      .form-group label {
+        font-size: 14px;
+      }
+
+      .attestation-content h2 {
+        font-size: 18px;
+      }
+
+      .module-card-icon {
+        font-size: 36px;
+      }
+
+      .module-card-title {
+        font-size: 16px;
+      }
+
+      .sidebar-toggle {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+      }
+
+      .reset-modal-content h2,
+      #policyPopupContent h2 {
+        font-size: 20px !important;
+      }
+
+      .reset-modal-content p,
+      #policyPopupContent p {
+        font-size: 14px !important;
+      }
+    }
+  </style>
+
+  <link rel="stylesheet" href="assets/modern-theme.css">
+</head>
+<body class="modern-theme">
+  <div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo" onclick="goHome()">
+        <img class="sidebar-logo-img" src="PSY9_Red-removebg-preview.png" alt="PSY9 Security Logo">
+      </div>
+      <div class="sidebar-actions">
+        <button class="home-button" onclick="goHome()">
+          
+          <span>Return to Home</span>
+        </button>
+        <button class="home-button home-button-danger" onclick="showResetModal()">
+          
+          <span>Reset Training</span>
+        </button>
+      </div>
+    </div>
+    
+    <div class="module-list">
+      <div class="module-item" id="module-phishing" onclick="loadModule('phishing')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">Phishing, Smishing & Vishing</span>
+          </div>
+          <div class="module-status" id="status-phishing"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-phishing" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-phishing">0/8 slides completed</div>
+        </div>
+      </div>
+      
+      <div class="module-item" id="module-ceo" onclick="loadModule('ceo')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">CEO & Executive Fraud</span>
+          </div>
+          <div class="module-status" id="status-ceo"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-ceo" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-ceo">0/6 slides completed</div>
+        </div>
+      </div>
+      
+      <div class="module-item" id="module-watering" onclick="loadModule('watering')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">Watering Hole Attacks</span>
+          </div>
+          <div class="module-status" id="status-watering"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-watering" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-watering">0/8 slides completed</div>
+        </div>
+      </div>
+      
+      <div class="module-item" id="module-general" onclick="loadModule('general')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">General Cybersecurity Awareness</span>
+          </div>
+          <div class="module-status" id="status-general"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-general" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-general">0/10 slides completed</div>
+        </div>
+      </div>
+
+      <div class="module-item" id="module-password-mfa" onclick="loadModule('password-mfa')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">Password & MFA Training</span>
+          </div>
+          <div class="module-status" id="status-password-mfa"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-password-mfa" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-password-mfa">0/10 slides completed</div>
+        </div>
+      </div>
+
+      <div class="module-item" id="module-incident-response" onclick="loadModule('incident-response')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">Incident Response Training</span>
+          </div>
+          <div class="module-status" id="status-incident-response"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-incident-response" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-incident-response">0/9 slides completed</div>
+        </div>
+      </div>
+      
+      <div class="module-item" id="module-privacy" onclick="loadModule('privacy')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">Privacy Awareness Training</span>
+          </div>
+          <div class="module-status" id="status-privacy"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-privacy" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-privacy">0/8 slides completed</div>
+        </div>
+      </div>
+      
+      <div class="module-item" id="module-secure-coding" onclick="loadModule('secure-coding')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">Secure Coding (OWASP)</span>
+          </div>
+          <div class="module-status" id="status-secure-coding"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-secure-coding" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-secure-coding">0/6 slides completed</div>
+        </div>
+      </div>
+      
+      <div class="module-item" id="module-ssdlc" onclick="loadModule('ssdlc')">
+        <div class="module-title-wrapper">
+          <div class="module-title-content">
+            
+            <span class="module-name">Secure SDLC (SSDLC)</span>
+          </div>
+          <div class="module-status" id="status-ssdlc"></div>
+        </div>
+        <div class="module-progress">
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-ssdlc" style="width: 0%"></div>
+          </div>
+          <div class="progress-text" id="progress-text-ssdlc">0/9 slides completed</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <button class="sidebar-toggle" onclick="toggleSidebar()" title="Toggle Sidebar">▤</button>
+  
+  <div class="main-content">
+    <div class="portal-lock-screen" id="portalLockScreen">
+      <div class="portal-lock-card">
+        <div style="font-size:72px; margin-bottom:12px;">🔒</div>
+        <h2 style="margin:0 0 10px 0; font-size:34px;">Training Portal Locked</h2>
+        <p id="portalLockReason" style="margin:0; font-size:18px; line-height:1.6; opacity:0.95;">
+          Training portal is temporarily unavailable. Please contact your administrator.
+        </p>
+      </div>
+    </div>
+
+    <!-- Welcome/About Screen -->
+    <div class="policy-attestation" id="welcomeScreen" style="display: none;">
+      <div class="attestation-container">
+        <div class="grc-logo-header">
+          <img class="grc-header-logo" src="PSY9_Red-removebg-preview.png" alt="PSY9 Security Logo">
+          
+        </div>
+
+        <div class="attestation-content welcome-content">
+          <h2 class="welcome-heading">Welcome to Cyber Security Training</h2>
+
+          <div class="welcome-overview-card">
+            <h3>About The Training Module</h3>
+            <p>9 interactive modules covering Phishing, CEO Fraud, Watering Hole, General Security, Password & MFA, Incident Response, Privacy, Secure Coding, and SSDLC.</p>
+          </div>
+
+         
+
+          <div class="welcome-cta">
+            <button class="attest-button" onclick="showPolicyAttestation()">
+              Continue to Employee Details
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Employee Details Screen -->
+    <div class="policy-attestation" id="policyAttestation" style="display: none;">
+      <div class="attestation-container">
+        <div class="grc-logo-header">
+          <img class="grc-header-logo" src="PSY9_Red-removebg-preview.png" alt="PSY9 Security Logo">
+         
+        </div>
+        
+        <div class="attestation-content employee-content">
+          <div class="employee-header">
+            <h2>Employee Details</h2>
+            <p>Please fill in your details before starting the training.</p>
+          </div>
+          
+          <div class="attestation-form">
+            <form id="employeeForm" class="employee-form" onsubmit="completeAttestation(event)">
+              <div class="form-group">
+                <label for="employeeName">Name</label>
+                <input class="form-input" type="text" id="employeeName" name="name" autocomplete="name" required>
+              </div>
+              <div class="form-group">
+                <label for="employeeDepartment">Department</label>
+                <input class="form-input" type="text" id="employeeDepartment" name="department" autocomplete="organization-title" required>
+              </div>
+              <div class="form-group">
+                <label for="employeeEmail">Email</label>
+                <input class="form-input" type="email" id="employeeEmail" name="email" autocomplete="email" required>
+              </div>
+              <p class="employee-form-note">All fields are required.</p>
+              <button class="attest-button" id="attestButton" type="submit">
+                Save & Begin Training
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Home Screen -->
+    <div class="home-screen" id="homeScreen" style="display: none;">
+      <h1 class="home-title"> Cybersecurity & Privacy Training</h1>
+      <p class="home-subtitle">Protect your organization from security threats and maintain data privacy</p>
+      
+      <!-- Completion Status Banner (shows when all enabled modules complete) -->
+      <div id="completionBanner" style="display: none; background: linear-gradient(135deg, var(--success-green), #166534); border-radius: 12px; padding: 20px; margin: 10px auto 20px auto; max-width: 800px; text-align: center; box-shadow: 0 4px 20px rgba(76,175,80,0.3);">
+        <div style="display: flex; align-items: center; justify-content: center; gap: 15px;">
+          <span style="font-size: 32px;">🎉</span>
+          <h3 style="margin: 0; color: white; font-size: 22px;">All Enabled Modules Complete!</h3>
+        </div>
+        <p style="margin: 10px 0 15px 0; color: rgba(255,255,255,0.95); font-size: 16px;">
+          Congratulations! You've completed all modules currently enabled by admin.
+        </p>
+        <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+          <button onclick="exitTraining()" style="background: white; color: #333; border: none; padding: 10px 20px; border-radius: 6px; font-size: 14px; font-weight: 600; cursor: pointer;">Generate Certificate and Exit</button>
+        </div>
+      </div>
+      
+      <div class="module-cards">
+        <div class="module-card" data-module="phishing" onclick="loadModule('phishing')">
+          <div class="module-card-icon">🎣</div>
+          <div class="module-card-title">Phishing, Smishing & Vishing</div>
+          <div class="module-card-description">Learn to identify and defend against attacks via email, SMS, and voice calls</div>
+        </div>
+        
+        <div class="module-card" data-module="ceo" onclick="loadModule('ceo')">
+          <div class="module-card-icon">👔</div>
+          <div class="module-card-title">CEO & Executive Fraud</div>
+          <div class="module-card-description">Recognize and stop business email compromise and executive impersonation</div>
+        </div>
+        
+        <div class="module-card" data-module="watering" onclick="loadModule('watering')">
+          <div class="module-card-icon">🌐</div>
+          <div class="module-card-title">Watering Hole Attacks</div>
+          <div class="module-card-description">Detect when trusted websites have been compromised to target your organization</div>
+        </div>
+        
+        <div class="module-card" data-module="general" onclick="loadModule('general')">
+          <div class="module-card-icon">🛡️</div>
+          <div class="module-card-title">General Cybersecurity Awareness</div>
+          <div class="module-card-description">Master essential security practices including ransomware defense, device security, and password management</div>
+        </div>
+
+        <div class="module-card" data-module="password-mfa" onclick="loadModule('password-mfa')">
+          <div class="module-card-icon">🔐</div>
+          <div class="module-card-title">Password & MFA Training</div>
+          <div class="module-card-description">Build stronger password habits and defend against MFA push attacks</div>
+        </div>
+
+        <div class="module-card" data-module="incident-response" onclick="loadModule('incident-response')">
+          <div class="module-card-icon">🚨</div>
+          <div class="module-card-title">Incident Response Training</div>
+          <div class="module-card-description">Learn the correct first actions when you detect suspicious security incidents</div>
+        </div>
+        
+        <div class="module-card" data-module="privacy" onclick="loadModule('privacy')">
+          <div class="module-card-icon">🔒</div>
+          <div class="module-card-title">Privacy Awareness Training</div>
+          <div class="module-card-description">Master PII protection, data handling, and GDPR/CCPA compliance requirements</div>
+        </div>
+        
+        <div class="module-card" data-module="secure-coding" onclick="loadModule('secure-coding')">
+          <div class="module-card-icon">💻</div>
+          <div class="module-card-title">Secure Coding (OWASP)</div>
+          <div class="module-card-description">Learn to prevent OWASP Top 10 vulnerabilities with hands-on coding simulations</div>
+        </div>
+        
+        <div class="module-card" data-module="ssdlc" onclick="loadModule('ssdlc')">
+          <div class="module-card-icon">🧭</div>
+          <div class="module-card-title">Secure SDLC (SSDLC)</div>
+          <div class="module-card-description">Learn to integrate security into every phase of the software development lifecycle</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Module Transition Screen -->
+    <div class="transition-screen" id="transitionScreen">
+      <div class="transition-content">
+        <div class="transition-icon" id="transitionIcon">🎯</div>
+        <h2 class="transition-title" id="transitionTitle">Module Complete!</h2>
+        <p class="transition-message" id="transitionMessage">Great work! Ready for the next challenge?</p>
+        <div id="transitionButtons">
+          <button class="transition-button" id="transitionButton" onclick="continueToNext()">Continue</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Module Content Frame -->
+    <iframe class="content-frame" id="contentFrame" style="display: none;"></iframe>
+    
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+      <div class="loading-spinner"></div>
+    </div>
+  </div>
+
+  <!-- Reset Confirmation Modal -->
+  <div class="reset-modal" id="resetModal">
+    <div class="reset-modal-content">
+      <div class="reset-modal-icon">⚠️</div>
+      <h2 class="reset-modal-title">Reset Training Progress?</h2>
+      <p class="reset-modal-message">
+        Are you sure you want to reset all training progress- This will clear all completed modules and require employee details again.
+      </p>
+      <div class="reset-modal-buttons">
+        <button class="reset-modal-button cancel" onclick="closeResetModal()">Cancel</button>
+        <button class="reset-modal-button confirm" onclick="confirmReset()">Reset Training</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Module configurations
+    const modules = {
+      phishing: {
+        name: 'Phishing, Smishing & Vishing',
+        path: 'phishing-smishing-vishing-training/enhanced-interactive-training.html',
+        icon: '🎣',
+        totalSlides: 8,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      ceo: {
+        name: 'CEO & Executive Fraud',
+        path: 'ceo-executive-fraud-training/enhanced-interactive-training.html',
+        icon: '👔',
+        totalSlides: 6,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      watering: {
+        name: 'Watering Hole Attacks',
+        path: 'watering-hole-attacks-training/enhanced-interactive-training.html',
+        icon: '🌐',
+        totalSlides: 8,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      general: {
+        name: 'General Cybersecurity Awareness',
+        path: 'general-cybersecurity-training/enhanced-interactive-training.html',
+        icon: '🛡️',
+        totalSlides: 10,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      'password-mfa': {
+        name: 'Password & MFA Training',
+        path: 'Password-mfa-training/password-mfa-training.html',
+        icon: '🔐',
+        totalSlides: 10,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      'incident-response': {
+        name: 'Incident Response Training',
+        path: 'incident-response training/incident-response-training.html',
+        icon: '🚨',
+        totalSlides: 9,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      privacy: {
+        name: 'Privacy Awareness Training',
+        path: 'privacy-awareness-training/enhanced-interactive-training.html',
+        icon: '🔒',
+        totalSlides: 8,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      'secure-coding': {
+        name: 'Secure Coding (OWASP Top 10)',
+        path: 'secure-coding-training/enhanced-interactive-training.html',
+        icon: '💻',
+        totalSlides: 6,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      },
+      ssdlc: {
+        name: 'Secure SDLC (SSDLC)',
+        path: 'SSDLC-Training/ssdlc-training-module.html',
+        icon: '🧭',
+        totalSlides: 9,
+        currentSlide: 0,
+        completed: false,
+        choices: { choices: {} }
+      }
+    };
+    
+    function getEmployeeApiCandidates() {
+      const configuredUrl = String(window.EMPLOYEE_API_URL || '').trim();
+      const sameOriginUrl = '/api/v1/employee-details';
+      const localApiUrl = 'http://localhost:3001/api/v1/employee-details';
+      const candidates = [];
+
+      function addCandidate(url) {
+        if (url && !candidates.includes(url)) {
+          candidates.push(url);
+        }
+      }
+
+      if (configuredUrl) {
+        addCandidate(configuredUrl);
+      }
+
+      if (window.location.protocol === 'file:') {
+        addCandidate(localApiUrl);
+        return candidates;
+      }
+
+      const localHosts = ['localhost', '127.0.0.1', '::1'];
+      const isLocalHost = localHosts.includes(window.location.hostname);
+      const safeHostname = window.location.hostname === '::1'
+        ? '[::1]'
+        : window.location.hostname;
+      const hostApiUrl = `${window.location.protocol}//${safeHostname}:3001/api/v1/employee-details`;
+
+      addCandidate(hostApiUrl);
+
+      if (isLocalHost) {
+        addCandidate(localApiUrl);
+      }
+
+      addCandidate(sameOriginUrl);
+      return candidates;
+    }
+
+    const employeeApiCandidates = getEmployeeApiCandidates();
+
+    function getPublicStateApiCandidates() {
+      const configuredUrl = String(window.PUBLIC_STATE_API_URL || '').trim();
+      const sameOriginUrl = '/api/v1/public-state';
+      const localApiUrl = 'http://localhost:3001/api/v1/public-state';
+      const candidates = [];
+
+      function addCandidate(url) {
+        if (url && !candidates.includes(url)) {
+          candidates.push(url);
+        }
+      }
+
+      if (configuredUrl) {
+        addCandidate(configuredUrl);
+      }
+
+      if (window.location.protocol === 'file:') {
+        addCandidate(localApiUrl);
+        return candidates;
+      }
+
+      const localHosts = ['localhost', '127.0.0.1', '::1'];
+      const isLocalHost = localHosts.includes(window.location.hostname);
+      const safeHostname = window.location.hostname === '::1' ? '[::1]' : window.location.hostname;
+      const hostApiUrl = `${window.location.protocol}//${safeHostname}:3001/api/v1/public-state`;
+
+      addCandidate(hostApiUrl);
+      if (isLocalHost) {
+        addCandidate(localApiUrl);
+      }
+      addCandidate(sameOriginUrl);
+      return candidates;
+    }
+
+    const publicStateApiCandidates = getPublicStateApiCandidates();
+
+    let portalState = {
+      moduleAvailability: {},
+      siteLock: {
+        locked: false,
+        reason: ''
+      }
+    };
+
+    let currentModule = null;
+    let nextModule = null;
+
+    function getActiveModuleStorageKey() {
+      return `activeModule_${getTrainingVersion()}`;
+    }
+
+    function persistActiveModule(moduleId) {
+      const storageKey = getActiveModuleStorageKey();
+      if (moduleId) {
+        localStorage.setItem(storageKey, moduleId);
+      } else {
+        localStorage.removeItem(storageKey);
+      }
+    }
+
+    function getPersistedActiveModule() {
+      return localStorage.getItem(getActiveModuleStorageKey());
+    }
+
+    function isModuleEnabled(moduleId) {
+      const availability = portalState.moduleAvailability || {};
+      if (availability[moduleId] === undefined) {
+        return true;
+      }
+      return Boolean(availability[moduleId]);
+    }
+
+    function getEnabledModuleIds() {
+      return Object.keys(modules).filter((moduleId) => isModuleEnabled(moduleId));
+    }
+
+    function areAllEnabledModulesCompleted() {
+      const enabledModules = getEnabledModuleIds();
+      if (enabledModules.length === 0) {
+        return false;
+      }
+      return enabledModules.every((moduleId) => Boolean(modules[moduleId] && modules[moduleId].completed));
+    }
+
+    function updateCompletionBannerVisibility() {
+      const banner = document.getElementById('completionBanner');
+      if (!banner) return;
+      banner.style.display = areAllEnabledModulesCompleted() ? 'block' : 'none';
+    }
+
+    function escapeHtml(value) {
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function applyPortalState() {
+      const lockScreen = document.getElementById('portalLockScreen');
+      const lockReason = document.getElementById('portalLockReason');
+      const isLocked = Boolean(portalState?.siteLock?.locked);
+      const reason = String(portalState?.siteLock?.reason || '').trim() ||
+        'Training portal is temporarily unavailable. Please contact your administrator.';
+
+      if (lockReason) {
+        lockReason.textContent = reason;
+      }
+
+      if (lockScreen) {
+        lockScreen.classList.toggle('show', isLocked);
+      }
+
+      if (isLocked) {
+        currentModule = null;
+        document.getElementById('contentFrame').style.display = 'none';
+        document.getElementById('transitionScreen').classList.remove('show');
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('policyAttestation').style.display = 'none';
+      } else {
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const policyAttestation = document.getElementById('policyAttestation');
+        const homeScreen = document.getElementById('homeScreen');
+        const contentFrame = document.getElementById('contentFrame');
+        const version = getTrainingVersion();
+        const attestationComplete = localStorage.getItem(`policyAttestationComplete_${version}`) === 'true';
+
+        const everythingHidden =
+          welcomeScreen.style.display === 'none' &&
+          policyAttestation.style.display === 'none' &&
+          homeScreen.style.display === 'none' &&
+          contentFrame.style.display === 'none';
+
+        if (everythingHidden) {
+          if (attestationComplete) {
+            homeScreen.style.display = 'flex';
+            document.getElementById('sidebar').style.display = 'flex';
+            document.querySelector('.sidebar-toggle').style.display = 'flex';
+          } else {
+            welcomeScreen.style.display = 'flex';
+            document.getElementById('sidebar').style.display = 'none';
+            document.querySelector('.sidebar-toggle').style.display = 'none';
+          }
+        }
+      }
+
+      Object.keys(modules).forEach((moduleId) => {
+        const enabled = isModuleEnabled(moduleId);
+        const sidebarItem = document.getElementById(`module-${moduleId}`);
+        if (sidebarItem) {
+          sidebarItem.classList.toggle('disabled', !enabled || isLocked);
+          sidebarItem.title = (!enabled || isLocked) ? 'This module is currently disabled by admin.' : '';
+        }
+      });
+
+      document.querySelectorAll('.module-card[data-module]').forEach((card) => {
+        const moduleId = card.getAttribute('data-module');
+        const enabled = isModuleEnabled(moduleId);
+        card.classList.toggle('disabled', !enabled || isLocked);
+        card.title = (!enabled || isLocked) ? 'This module is currently disabled by admin.' : '';
+        card.style.display = (!enabled || isLocked) ? 'none' : '';
+      });
+
+      updateCompletionBannerVisibility();
+    }
+
+    async function refreshPortalState() {
+      for (const apiUrl of publicStateApiCandidates) {
+        try {
+          const response = await fetch(apiUrl);
+          if (!response.ok) {
+            continue;
+          }
+          const payload = await response.json();
+          portalState = {
+            moduleAvailability: payload.moduleAvailability || {},
+            siteLock: payload.siteLock || { locked: false, reason: '' }
+          };
+          applyPortalState();
+          return;
+        } catch (_error) {
+          // Try next candidate.
+        }
+      }
+
+      // If backend is unreachable, keep the app usable in local mode.
+      portalState = {
+        moduleAvailability: {},
+        siteLock: { locked: false, reason: '' }
+      };
+      applyPortalState();
+    }
+
+    function startPortalStatePolling() {
+      setInterval(() => {
+        refreshPortalState();
+      }, 30000);
+    }
+    
+    // Initialize on load
+    window.onload = async function() {
+      loadProgress();
+      setupMessageListener();
+      checkResetFlag();
+      await refreshPortalState();
+      startPortalStatePolling();
+
+      if (portalState?.siteLock?.locked) {
+        return;
+      }
+
+      // Check if attestation has been completed for this version
+      const version = getTrainingVersion();
+      const attestationComplete = localStorage.getItem(`policyAttestationComplete_${version}`);
+      if (attestationComplete === 'true') {
+        const persistedModule = getPersistedActiveModule();
+
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('policyAttestation').style.display = 'none';
+        document.getElementById('sidebar').style.display = 'flex';
+        document.querySelector('.sidebar-toggle').style.display = 'flex';
+
+        updateCompletionBannerVisibility();
+
+        if (persistedModule && modules[persistedModule] && isModuleEnabled(persistedModule)) {
+          document.getElementById('homeScreen').style.display = 'none';
+          loadModule(persistedModule);
+        } else if (persistedModule) {
+          persistActiveModule(null);
+          document.getElementById('homeScreen').style.display = 'flex';
+        } else {
+          document.getElementById('homeScreen').style.display = 'flex';
+        }
+      } else {
+        document.getElementById('welcomeScreen').style.display = 'flex';
+        document.getElementById('policyAttestation').style.display = 'none';
+        document.getElementById('homeScreen').style.display = 'none';
+        document.getElementById('contentFrame').style.display = 'none';
+        // Hide sidebar until attestation is complete
+        document.getElementById('sidebar').style.display = 'none';
+        document.querySelector('.sidebar-toggle').style.display = 'none';
+      }
+    };
+
+    // Show employee details screen (from welcome)
+    function showPolicyAttestation() {
+      document.getElementById('welcomeScreen').style.display = 'none';
+      document.getElementById('policyAttestation').style.display = 'flex';
+      prefillEmployeeForm();
+    }
+    
+    function prefillEmployeeForm() {
+      const version = getTrainingVersion();
+      const savedEmployee = localStorage.getItem(`employeeDetails_${version}`);
+      if (!savedEmployee) return;
+
+      try {
+        const employee = JSON.parse(savedEmployee);
+        const nameInput = document.getElementById('employeeName');
+        const departmentInput = document.getElementById('employeeDepartment');
+        const emailInput = document.getElementById('employeeEmail');
+        if (nameInput) nameInput.value = employee.name || '';
+        if (departmentInput) departmentInput.value = employee.department || '';
+        if (emailInput) emailInput.value = employee.email || '';
+      } catch (error) {
+        console.warn('Could not parse saved employee details.', error);
+      }
+    }
+    
+    async function saveEmployeeDetailsToDatabase(employeeDetails) {
+      let lastError;
+      let sawHttpError = false;
+
+      for (const employeeApiUrl of employeeApiCandidates) {
+        try {
+          const response = await fetch(employeeApiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              name: employeeDetails.name,
+              department: employeeDetails.department,
+              email: employeeDetails.email
+            })
+          });
+
+          const payload = await response.json().catch(() => ({}));
+          if (!response.ok) {
+            sawHttpError = true;
+            throw new Error(payload.error || 'Failed to save employee details');
+          }
+
+          return payload;
+        } catch (error) {
+          lastError = error;
+        }
+      }
+
+      const message = String(lastError && lastError.message ? lastError.message : '').trim();
+      if (!sawHttpError && (!message || message.toLowerCase().includes('failed to fetch'))) {
+        throw new Error('Could not reach backend API. Start backend and open this app from http://localhost:3001/index.html');
+      }
+
+      throw lastError || new Error('Failed to save employee details');
+    }
+
+    // Save employee details and show home screen
+    async function completeAttestation(event) {
+      if (event) event.preventDefault();
+
+      const nameInput = document.getElementById('employeeName');
+      const departmentInput = document.getElementById('employeeDepartment');
+      const emailInput = document.getElementById('employeeEmail');
+      const submitButton = document.getElementById('attestButton');
+      const name = (nameInput.value || '').trim();
+      const department = (departmentInput.value || '').trim();
+      const email = (emailInput.value || '').trim();
+
+      if (!name || !department || !email) {
+        alert('Please fill Name, Department, and Email.');
+        return;
+      }
+
+      const version = getTrainingVersion();
+      const employeeDetails = {
+        name: name,
+        department: department,
+        email: email,
+        submittedAt: new Date().toISOString()
+      };
+
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving...';
+      }
+
+      let backendSaved = true;
+      try {
+        await saveEmployeeDetailsToDatabase(employeeDetails);
+      } catch (error) {
+        backendSaved = false;
+        console.error('Employee details save failed:', error);
+        const continueOffline = confirm(
+          `${(error && error.message) || 'Could not save your details right now.'}\n\n` +
+          'Continue in local mode and start training anyway?'
+        );
+        if (!continueOffline) {
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = 'Save & Begin Training';
+          }
+          return;
+        }
+      }
+
+      localStorage.setItem(`employeeDetails_${version}`, JSON.stringify(employeeDetails));
+      localStorage.setItem(`policyAttestationComplete_${version}`, 'true');
+      if (!backendSaved) {
+        localStorage.setItem(`employeeDetailsPendingSync_${version}`, JSON.stringify(employeeDetails));
+      }
+
+      document.getElementById('policyAttestation').style.display = 'none';
+      document.getElementById('homeScreen').style.display = 'flex';
+      // Show sidebar after attestation
+      document.getElementById('sidebar').style.display = 'flex';
+      document.querySelector('.sidebar-toggle').style.display = 'flex';
+
+      if (submitButton) {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Save & Begin Training';
+      }
+    }
+    
+    // Check for reset flag
+    function checkResetFlag() {
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('reset') === 'true') {
+        resetProgress();
+        window.history.replaceState({}, document.title, window.location.pathname);
+      }
+    }
+    
+    // Reset progress
+    function resetProgress() {
+      // Clear all localStorage for this training
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const key = localStorage.key(i);
+        if (key && (
+          key.includes('cybersecurityPrivacyProgress_') ||
+          key.includes('policyAttestationComplete_') ||
+          key.includes('employeeDetails_') ||
+          key.includes('activeModule_')
+        )) {
+          keysToRemove.push(key);
+        }
+      }
+      keysToRemove.forEach(key => localStorage.removeItem(key));
+
+      // Reload the page to start fresh (same as monthly auto-reset)
+      window.location.reload();
+    }
+    
+    // Get training version/campaign ID from URL or generate one
+    function getTrainingVersion() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const campaignId = urlParams.get('campaign') || urlParams.get('version') || urlParams.get('assignment');
+
+      // If we have a campaign ID, use it
+      if (campaignId) {
+        console.log(`ℹ️ Version: ${campaignId} (from URL parameter)`);
+        return campaignId;
+      }
+
+      // Use year-month to auto-reset monthly
+      const now = new Date();
+      const version = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+      console.log(`ℹ️ Version: ${version} (auto-version by month)`);
+      return version;
+    }
+    
+    // Load saved progress
+    function loadProgress() {
+      const version = getTrainingVersion();
+      const storageKey = `cybersecurityPrivacyProgress_${version}`;
+      
+      console.log(`ℹ️ Loading from key: ${storageKey}`);
+      const saved = localStorage.getItem(storageKey);
+      if (saved) {
+        console.log('✅ Found saved progress:', saved.substring(0, 100) + '...');
+        const progress = JSON.parse(saved);
+        Object.keys(progress).forEach(key => {
+          if (modules[key]) {
+            modules[key].currentSlide = progress[key].currentSlide || 0;
+            modules[key].completed = progress[key].completed || false;
+            modules[key].choices = progress[key].choices || { choices: {} };
+          }
+        });
+      } else {
+        console.log('ℹ️ No saved progress found - starting fresh');
+      }
+      updateSidebar();
+    }
+    
+    // Save progress
+    function saveProgress() {
+      const version = getTrainingVersion();
+      const storageKey = `cybersecurityPrivacyProgress_${version}`;
+      localStorage.setItem(storageKey, JSON.stringify(modules));
+      console.log(`✅ Saved progress to key: ${storageKey}`);
+    }
+    
+    // Setup message listener for iframe communication
+    function setupMessageListener() {
+      window.addEventListener('message', function(event) {
+        if (event.data.type === 'goHome') {
+          // Handle whale logo click to go home
+          goHome();
+        } else if (event.data.type === 'slideChange') {
+          if (currentModule && modules[currentModule]) {
+            modules[currentModule].currentSlide = event.data.slide;
+            saveProgress();
+            updateSidebar();
+          }
+        } else if (event.data.type === 'moduleComplete') {
+          if (currentModule && modules[currentModule]) {
+            // Mark as completed but allow re-entry
+            if (!modules[currentModule].completed) {
+              modules[currentModule].completed = true;
+              modules[currentModule].currentSlide = modules[currentModule].totalSlides;
+              saveProgress();
+              updateSidebar();
+              checkOverallCompletion();
+              showTransition();
+            } else {
+              // If already completed and user is reviewing, just show transition
+              showTransition();
+            }
+          }
+        } else if (event.data.type === 'choiceUpdate') {
+          // Store choice for the current module
+          if (currentModule && modules[currentModule] && event.data.slideId && event.data.choice !== undefined) {
+            if (event.data.choicesData) {
+              modules[currentModule].choices = event.data.choicesData;
+            } else {
+              // Fallback - ensure structure exists
+              if (!modules[currentModule].choices.choices) {
+                modules[currentModule].choices = { choices: {} };
+              }
+              modules[currentModule].choices.choices[event.data.slideId] = event.data.choice;
+            }
+            saveProgress();
+          }
+        }
+      });
+    }
+    
+    // Go to home screen
+    function goHome() {
+      currentModule = null;
+      persistActiveModule(null);
+      document.getElementById('homeScreen').style.display = 'flex';
+      document.getElementById('contentFrame').style.display = 'none';
+      document.getElementById('transitionScreen').classList.remove('show');
+
+      // Clear active state
+      document.querySelectorAll('.module-item').forEach(item => {
+        item.classList.remove('active');
+      });
+
+      // Show completion banner if all enabled modules are complete
+      updateCompletionBannerVisibility();
+    }
+
+    // Load a module
+    function loadModule(moduleId) {
+      const module = modules[moduleId];
+      if (!module) return;
+
+      if (portalState?.siteLock?.locked) {
+        alert('Training portal is currently locked by admin.');
+        return;
+      }
+
+      if (!isModuleEnabled(moduleId)) {
+        alert('This module is currently disabled by admin.');
+        return;
+      }
+      
+      currentModule = moduleId;
+      persistActiveModule(moduleId);
+      
+      // Show loading overlay
+      document.getElementById('loadingOverlay').classList.add('show');
+      
+      // Update UI
+      document.getElementById('homeScreen').style.display = 'none';
+      document.getElementById('contentFrame').style.display = 'block';
+      document.getElementById('transitionScreen').classList.remove('show');
+      
+      // Load module content
+      const frame = document.getElementById('contentFrame');
+
+      function hideFrameScrollbars() {
+        try {
+          const frameDoc = frame.contentDocument || frame.contentWindow.document;
+          if (!frameDoc || !frameDoc.documentElement) return;
+          if (frameDoc.getElementById('globalHideScrollbarsStyle')) return;
+
+          const style = frameDoc.createElement('style');
+          style.id = 'globalHideScrollbarsStyle';
+          style.textContent = `
+            html, body, * {
+              scrollbar-width: none !important;
+              -ms-overflow-style: none !important;
+            }
+            *::-webkit-scrollbar {
+              width: 0 !important;
+              height: 0 !important;
+              display: none !important;
+              background: transparent !important;
+            }
+          `;
+
+          if (frameDoc.head) {
+            frameDoc.head.appendChild(style);
+          } else {
+            frameDoc.documentElement.appendChild(style);
+          }
+        } catch (error) {
+          // Ignore cross-origin frames and continue.
+        }
+      }
+      
+      // Hide loading overlay when iframe loads
+      frame.onload = function() {
+        hideFrameScrollbars();
+        setTimeout(() => {
+          document.getElementById('loadingOverlay').classList.remove('show');
+          
+          // Send restore state message to the iframe after it loads
+          if (module.choices && Object.keys(module.choices).length > 0) {
+            frame.contentWindow.postMessage({
+              type: 'restoreState',
+              module: moduleId,
+              choices: module.choices.choices || module.choices,
+              slide: module.currentSlide || 1
+            }, '*');
+          }
+        }, 300);
+      };
+      
+      let modulePath = module.path + '?';
+      
+      // For completed modules, start from slide 1 to allow review
+      // For in-progress modules, resume where they left off
+      if (!module.completed && module.currentSlide > 1) {
+        modulePath += '&slide=' + module.currentSlide;
+      } else if (module.completed) {
+        // Start from slide 1 for review, but keep choices
+        modulePath += '&slide=1&reviewMode=true';
+      }
+      
+      // Always pass choices so users can see their previous responses
+      if (module.choices && Object.keys(module.choices).length > 0) {
+        modulePath += '&choices=' + encodeURIComponent(JSON.stringify(module.choices));
+      }
+      
+      frame.src = modulePath;
+      // Update sidebar
+      document.querySelectorAll('.module-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      document.getElementById(`module-${moduleId}`).classList.add('active');
+      
+      updateSidebar();
+    }
+    
+    // Show transition screen
+    function showTransition() {
+      const moduleOrder = ['phishing', 'ceo', 'watering', 'general', 'password-mfa', 'incident-response', 'privacy', 'secure-coding', 'ssdlc'];
+      const enabledModuleOrder = moduleOrder.filter((moduleId) => isModuleEnabled(moduleId));
+      const currentIndex = enabledModuleOrder.indexOf(currentModule);
+      const isReviewing = modules[currentModule] && modules[currentModule].completed;
+      
+      // Check if all enabled modules are complete
+      const allComplete = areAllEnabledModulesCompleted();
+      
+      // Reset button container to single button first
+      const buttonContainer = document.getElementById('transitionButtons');
+      buttonContainer.innerHTML = '<button class="transition-button" id="transitionButton" onclick="continueToNext()">Continue</button>';
+      
+      if (allComplete) {
+        // All modules complete
+        nextModule = null;
+        document.getElementById('transitionIcon').textContent = '🏆';
+        document.getElementById('transitionTitle').textContent = isReviewing ? 'Review Complete!' : 'Training Complete!';
+        document.getElementById('transitionMessage').textContent = isReviewing ? 
+          'Thanks for reviewing! Feel free to review other modules or exit the training.' :
+          'Congratulations! You\'ve completed all Cybersecurity & Privacy modules!';
+        document.getElementById('transitionButton').textContent = 'Return to Home';
+      } else if (currentIndex !== -1 && currentIndex < enabledModuleOrder.length - 1 && !isReviewing) {
+        // More modules in order (only show next module if not reviewing)
+        nextModule = enabledModuleOrder[currentIndex + 1];
+        document.getElementById('transitionIcon').textContent = '🚀';
+        document.getElementById('transitionTitle').textContent = 'Module Complete!';
+        document.getElementById('transitionMessage').textContent = `Great work on ${modules[currentModule].name}! Ready for ${modules[nextModule].name}?`;
+        document.getElementById('transitionButton').textContent = 'Start Next Module';
+      } else {
+        // Reviewing or last module but others not complete
+        // Check if there are more modules to review
+        const incompleteModules = enabledModuleOrder.filter(m => !modules[m].completed);
+        if (isReviewing && incompleteModules.length > 0) {
+          // Find next incomplete module for review
+          nextModule = incompleteModules[0];
+          document.getElementById('transitionIcon').textContent = '✅';
+          document.getElementById('transitionTitle').textContent = 'Review Complete!';
+          document.getElementById('transitionMessage').textContent = `Thanks for reviewing ${modules[currentModule].name}!`;
+          
+          // Replace with two buttons for review mode
+          buttonContainer.innerHTML = `
+            <button class="transition-button secondary" onclick="goHome();">
+              Return to Home
+            </button>
+            <button class="transition-button" onclick="loadModule('${nextModule}');">
+              Continue to Next Module
+            </button>
+          `;
+        } else {
+          nextModule = null;
+          document.getElementById('transitionIcon').textContent = isReviewing ? '✅' : '🎯';
+          document.getElementById('transitionTitle').textContent = isReviewing ? 'Review Complete!' : 'Module Complete!';
+          document.getElementById('transitionMessage').textContent = isReviewing ?
+            `Thanks for reviewing ${modules[currentModule].name}!` :
+            `Great work on ${modules[currentModule].name}! Check out the other modules to complete your training.`;
+          document.getElementById('transitionButton').textContent = 'Return to Home';
+        }
+      }
+      
+      document.getElementById('transitionScreen').classList.add('show');
+    }
+    
+    // Continue to next module
+    function continueToNext() {
+      if (nextModule) {
+        loadModule(nextModule);
+      } else {
+        goHome();
+      }
+    }
+    
+    // Update sidebar progress
+    function updateSidebar() {
+      Object.keys(modules).forEach(key => {
+        const module = modules[key];
+        const progress = (module.currentSlide / module.totalSlides) * 100;
+        const moduleItem = document.getElementById(`module-${key}`);
+        
+        // Update progress bar
+        document.getElementById(`progress-${key}`).style.width = `${progress}%`;
+        document.getElementById(`progress-text-${key}`).textContent = 
+          `${module.currentSlide}/${module.totalSlides} slides completed`;
+        
+        // Update status indicator
+        const status = document.getElementById(`status-${key}`);
+        status.className = 'module-status';
+        status.textContent = ''; // Clear any text
+        
+        if (module.completed) {
+          status.classList.add('completed');
+          if (moduleItem) moduleItem.classList.add('completed');
+        } else if (module.currentSlide > 0) {
+          status.classList.add('in-progress');
+          // Don't set any text content - CSS will handle the bullet
+          if (moduleItem) moduleItem.classList.remove('completed');
+        } else if (moduleItem) {
+          moduleItem.classList.remove('completed');
+        }
+      });
+
+      applyPortalState();
+    }
+    
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+      // Ctrl+Shift+R to reset
+      if (e.ctrlKey && e.shiftKey && e.key === 'R') {
+        e.preventDefault();
+        if (confirm('Reset all training progress?')) {
+          resetProgress();
+          goHome();
+        }
+      }
+      // Escape to go home
+      else if (e.key === 'Escape') {
+        goHome();
+      }
+    });
+
+    function checkOverallCompletion() {
+      if (areAllEnabledModulesCompleted()) {
+        showCompletionScreen();
+      }
+    }
+// Toggle sidebar function
+    function toggleSidebar() {
+      const sidebar = document.getElementById('sidebar');
+      const toggle = document.querySelector('.sidebar-toggle');
+      sidebar.classList.toggle('collapsed');
+      toggle.classList.toggle('collapsed');
+    }
+    
+    // Toggle instructions dropdown
+    function toggleInstructions() {
+      const content = document.getElementById('instructionsContent');
+      const arrow = document.getElementById('instructionArrow');
+      
+      if (content.style.maxHeight === '0px' || !content.style.maxHeight) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+        arrow.style.transform = 'rotate(180deg)';
+      } else {
+        content.style.maxHeight = '0';
+        arrow.style.transform = 'rotate(0)';
+      }
+    }
+    
+    // Show overall completion screen
+    function exitTraining() {
+      if (!areAllEnabledModulesCompleted()) {
+        alert('Complete all enabled modules before generating your certificate.');
+        return;
+      }
+
+      const version = getTrainingVersion();
+      let employeeDetails = {};
+      try {
+        employeeDetails = JSON.parse(localStorage.getItem(`employeeDetails_${version}`) || '{}');
+      } catch (_error) {
+        employeeDetails = {};
+      }
+
+      const enabledCompletedModules = getEnabledModuleIds()
+        .filter((moduleId) => modules[moduleId] && modules[moduleId].completed)
+        .map((moduleId) => modules[moduleId].name);
+
+      const employeeName = employeeDetails.name || 'Training Participant';
+      const employeeDepartment = employeeDetails.department || 'N/A';
+      const issueDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      const completedModuleListHtml = enabledCompletedModules
+        .map((name) => `<li style="margin:6px 0;">${escapeHtml(name)}</li>`)
+        .join('');
+
+      const certificateHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Training Completion Certificate</title>
+  <style>
+    body { margin: 0; font-family: 'Segoe UI', Arial, sans-serif; background: #f1f5f9; }
+    .page { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; }
+    .certificate {
+      width: min(980px, 100%);
+      background: linear-gradient(165deg, #ffffff 0%, #f8fbff 100%);
+      border: 10px solid #1e40af;
+      border-radius: 20px;
+      box-shadow: 0 16px 42px rgba(15, 23, 42, 0.2);
+      padding: 42px;
+      color: #0f172a;
+    }
+    .header { text-align: center; margin-bottom: 20px; }
+    .title { font-size: 44px; margin: 0 0 8px 0; color: #1e3a8a; }
+    .subtitle { font-size: 19px; margin: 0; color: #334155; }
+    .name { text-align: center; font-size: 36px; margin: 26px 0 8px 0; color: #0f172a; font-weight: 700; }
+    .line { width: 78%; margin: 0 auto 18px auto; border: none; border-top: 2px solid #93c5fd; }
+    .body-text { text-align: center; font-size: 18px; color: #334155; margin-bottom: 16px; }
+    .meta { display: flex; justify-content: space-between; gap: 20px; margin: 18px 0 22px; color: #1e293b; font-size: 15px; }
+    .module-wrap { margin-top: 14px; background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 14px 18px; }
+    .module-wrap h3 { margin: 0 0 8px 0; color: #1d4ed8; font-size: 16px; }
+    .module-wrap ul { margin: 0; padding-left: 20px; }
+    .footer { margin-top: 26px; display: flex; justify-content: space-between; align-items: flex-end; color: #334155; }
+    .badge-logo { width: 84px; height: auto; display: block; }
+    .small { font-size: 13px; color: #475569; }
+    @media print {
+      body { background: #fff; }
+      .page { padding: 0; }
+      .certificate { box-shadow: none; border-width: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <section class="certificate">
+      <header class="header">
+        <h1 class="title">Certificate of Completion</h1>
+        <p class="subtitle">Cybersecurity & Privacy Training</p>
+      </header>
+      <p class="body-text">This certifies that</p>
+      <div class="name">${escapeHtml(employeeName)}</div>
+      <hr class="line">
+      <p class="body-text">has successfully completed all the training modules.</p>
+      <div class="meta">
+        <div><strong>Department:</strong> ${escapeHtml(employeeDepartment)}</div>
+        <div><strong>Date Issued:</strong> ${escapeHtml(issueDate)}</div>
+      </div>
+      <div class="module-wrap">
+        <h3>Modules Completed</h3>
+        <ul>${completedModuleListHtml}</ul>
+      </div>
+      <div class="footer">
+        <div>
+          <div><strong>Verified Completion</strong></div>
+          <div class="small">Generated directly from the training portal progress state.</div>
+        </div>
+        <img class="badge-logo" src="PSY9_Red-removebg-preview.png" alt="PSY9 Logo">
+      </div>
+    </section>
+  </div>
+</body>
+</html>`;
+
+      // Use a hidden iframe to avoid popup blockers when printing certificates.
+      const printFrame = document.createElement('iframe');
+      printFrame.setAttribute('aria-hidden', 'true');
+      printFrame.style.position = 'fixed';
+      printFrame.style.right = '0';
+      printFrame.style.bottom = '0';
+      printFrame.style.width = '0';
+      printFrame.style.height = '0';
+      printFrame.style.border = '0';
+      printFrame.style.opacity = '0';
+      document.body.appendChild(printFrame);
+
+      const frameDoc = printFrame.contentDocument || (printFrame.contentWindow && printFrame.contentWindow.document);
+      if (!frameDoc) {
+        printFrame.remove();
+        alert('Could not create certificate preview. Please try again.');
+        return;
+      }
+
+      frameDoc.open();
+      frameDoc.write(certificateHtml);
+      frameDoc.close();
+
+      setTimeout(() => {
+        try {
+          if (printFrame.contentWindow) {
+            printFrame.contentWindow.focus();
+            printFrame.contentWindow.print();
+          }
+        } catch (_error) {
+          alert('Printing was blocked by your browser. Please enable printing and try again.');
+        } finally {
+          setTimeout(() => {
+            if (printFrame && printFrame.parentNode) {
+              printFrame.parentNode.removeChild(printFrame);
+            }
+          }, 1200);
+        }
+      }, 250);
+
+      if (window.parent !== window) {
+        window.parent.postMessage({ type: 'exitTraining' }, '*');
+      }
+
+      goHome();
+
+    }
+    function closeCompletionScreen() {
+      const screen = document.getElementById('finalCompletionScreen');
+      if (screen) screen.remove();
+      goHome();
+      // Banner will show automatically via goHome()
+    }
+
+    function showCompletionScreen() {
+      const completionHTML = `
+        <div id="finalCompletionScreen" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, var(--primary-purple) 0%, var(--dark-purple) 100%); overflow-y: auto; z-index: 1000;">
+          <button onclick="closeCompletionScreen()" style="position: absolute; top: 20px; right: 20px; background: rgba(255,255,255,0.2); border: 2px solid white; color: white; font-size: 24px; width: 40px; height: 40px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease;">✕</button>
+          <div style="text-align: center; max-width: 600px; padding: 40px 20px;">
+            <div style="font-size: 120px; margin-bottom: 40px; animation: bounce 2s ease-in-out infinite;">🏆</div>
+            <h1 style="font-size: 48px; margin-bottom: 20px; color: white; font-weight: 700;">Congratulations!</h1>
+            <h2 style="font-size: 28px; margin-bottom: 60px; opacity: 0.95; color: white;">You've Completed All Enabled Cybersecurity & Privacy Modules!</h2>
+            
+            <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
+              <button class="transition-button" onclick="closeCompletionScreen()" style="font-size: 18px; padding: 18px 36px; background: white; color: var(--success-green); border: 2px solid var(--success-green); width: 250px;">Review Modules</button>
+              <button class="transition-button" onclick="exitTraining()" style="font-size: 18px; padding: 18px 36px; background: white; color: #6c757d; border: 2px solid #6c757d; width: 250px;">Generate Certificate and Exit</button>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Remove any existing screens
+      const existing = document.getElementById('finalCompletionScreen');
+      if (existing) existing.remove();
+      
+      // Add the completion screen
+      const mainContent = document.querySelector('.main-content');
+      const div = document.createElement('div');
+      div.innerHTML = completionHTML;
+      mainContent.appendChild(div.firstElementChild);
+    }
+    
+    // Reset modal functions
+    function showResetModal() {
+      const modal = document.getElementById('resetModal');
+      const content = document.querySelector('.reset-modal-content');
+
+      modal.classList.add('show');
+
+      // Trigger animation after a small delay
+      setTimeout(() => {
+        modal.classList.add('animate-in');
+        content.classList.add('animate-in');
+      }, 10);
+    }
+
+    function closeResetModal() {
+      const modal = document.getElementById('resetModal');
+      const content = document.querySelector('.reset-modal-content');
+
+      // Animate out
+      modal.classList.remove('animate-in');
+      content.classList.remove('animate-in');
+
+      // Remove show class after animation completes
+      setTimeout(() => {
+        modal.classList.remove('show');
+      }, 300);
+    }
+
+    function confirmReset() {
+      closeResetModal();
+      setTimeout(() => {
+        resetProgress();
+      }, 300);
+    }
+
+    // Console helper
+    console.log('%c GRC Engineering Cybersecurity & Privacy Training', 'color: #2563EB; font-size: 20px; font-weight: bold;');
+    console.log('Reset progress: window.resetTraining()');
+    window.resetTraining = function() {
+      resetProgress();
+      console.log('✅ Training progress reset');
+    };
+  </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
