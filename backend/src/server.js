@@ -85,7 +85,7 @@ const defaultSiteLock = {
 };
 
 app.set('trust proxy', true);
-app.use(express.json({ limit: '256kb' }));
+app.use(express.json({ limit: '10mb' }));
 app.use('/admin', express.static(path.join(__dirname, '..', 'public')));
 
 const sessionCookieName = 'admin_session';
@@ -162,12 +162,28 @@ function normalizeModuleId(value) {
   return normalizeString(value).toLowerCase().replace(/[^a-z0-9-]/g, '');
 }
 
+function slugifyModuleId(value) {
+  return normalizeString(value)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+}
+
 function normalizeEntryPath(value) {
   const cleaned = normalizeString(value).replace(/\\/g, '/').replace(/^\/+/, '');
   if (!cleaned || cleaned.includes('..') || cleaned.startsWith('/')) {
     return '';
   }
   return cleaned;
+}
+
+function normalizeModuleIcon(value) {
+  const icon = String(value || '').trim();
+  if (!icon) {
+    return '';
+  }
+
+  return Array.from(icon).slice(0, 2).join('');
 }
 
 function normalizeModuleRecord(rawModule) {
@@ -181,12 +197,343 @@ function normalizeModuleRecord(rawModule) {
   return {
     id,
     title,
-    entryPath
+    entryPath,
+    icon: normalizeModuleIcon(rawModule?.icon)
+  };
+}
+
+function getModuleTitleIcon(moduleRecord) {
+  const knownIcons = {
+    phishing: '🎣',
+    ceo: '👔',
+    watering: '🌐',
+    general: '🛡️',
+    'password-mfa': '🔐',
+    'incident-response': '🚨',
+    privacy: '🔒',
+    'secure-coding': '💻',
+    ssdlc: '🧭'
+  };
+
+  const normalizedId = normalizeModuleId(moduleRecord?.id);
+  if (knownIcons[normalizedId]) {
+    return knownIcons[normalizedId];
+  }
+
+  const normalizedTitle = normalizeString(moduleRecord?.title).toLowerCase();
+  if (normalizedTitle.includes('phishing') || normalizedTitle.includes('smishing') || normalizedTitle.includes('vishing')) {
+    return '🎣';
+  }
+  if (normalizedTitle.includes('executive') || normalizedTitle.includes('ceo') || normalizedTitle.includes('fraud')) {
+    return '👔';
+  }
+  if (normalizedTitle.includes('watering')) {
+    return '🌐';
+  }
+  if (normalizedTitle.includes('password') || normalizedTitle.includes('mfa')) {
+    return '🔐';
+  }
+  if (normalizedTitle.includes('incident')) {
+    return '🚨';
+  }
+  if (normalizedTitle.includes('privacy')) {
+    return '🔒';
+  }
+  if (normalizedTitle.includes('coding') || normalizedTitle.includes('owasp')) {
+    return '💻';
+  }
+  if (normalizedTitle.includes('sdlc')) {
+    return '🧭';
+  }
+  if (normalizedTitle.includes('cloud')) {
+    return '☁️';
+  }
+  if (normalizedTitle.includes('security') || normalizedTitle.includes('cyber')) {
+    return '🛡️';
+  }
+
+  return '📘';
+}
+
+function getModuleDescription(title) {
+  return `Launch ${normalizeString(title) || 'this training module'} from the training portal.`;
+}
+
+function countSlidesFromHtml(htmlContent) {
+  const source = String(htmlContent || '');
+  const explicitSlideIds = source.match(/id\s*=\s*['"]slide\d+['"]/gi);
+  if (explicitSlideIds && explicitSlideIds.length > 0) {
+    return explicitSlideIds.length;
+  }
+
+  const slideClassMatches = source.match(/class\s*=\s*['"][^'"]*\bslide\b[^'"]*['"]/gi);
+  if (slideClassMatches && slideClassMatches.length > 0) {
+    return slideClassMatches.length;
+  }
+
+  return 1;
+}
+
+function hasPortalTrackingBridge(htmlContent) {
+  return String(htmlContent || '').includes('data-portal-tracking-bridge="true"');
+}
+
+function buildPortalTrackingBridge(moduleId, totalSlides) {
+  const safeModuleId = JSON.stringify(moduleId);
+  const safeTotalSlides = Math.max(Number(totalSlides) || 1, 1);
+
+  return `
+<script data-portal-tracking-bridge="true">
+(function () {
+  const MODULE_ID = ${safeModuleId};
+  const FALLBACK_TOTAL_SLIDES = ${safeTotalSlides};
+  let lastReportedSlide = null;
+  let completionSent = false;
+
+  function getSlides() {
+    return Array.from(document.querySelectorAll('.slide'));
+  }
+
+  function getTotalSlides() {
+    const slides = getSlides();
+    return slides.length || FALLBACK_TOTAL_SLIDES || 1;
+  }
+
+  function getActiveSlideNumber() {
+    const activeSlide = document.querySelector('.slide.active[id^="slide"]');
+    if (activeSlide) {
+      const match = activeSlide.id.match(/slide(\\d+)/i);
+      if (match) {
+        return Number(match[1]) || 1;
+      }
+    }
+
+    const slides = getSlides();
+    const activeIndex = slides.findIndex((slide) => slide.classList.contains('active'));
+    return activeIndex >= 0 ? activeIndex + 1 : 1;
+  }
+
+  function postToParent(payload) {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(payload, '*');
+    }
+  }
+
+  function reportSlideChange() {
+    const slide = getActiveSlideNumber();
+    if (slide !== lastReportedSlide) {
+      lastReportedSlide = slide;
+      postToParent({
+        type: 'slideChange',
+        slide,
+        module: MODULE_ID
+      });
+    }
+
+    if (slide >= getTotalSlides()) {
+      reportCompletion();
+    }
+  }
+
+  function reportCompletion() {
+    if (completionSent) {
+      return;
+    }
+
+    completionSent = true;
+    postToParent({
+      type: 'moduleComplete',
+      module: MODULE_ID
+    });
+  }
+
+  function applySlideState(slideNumber) {
+    const requestedSlide = Math.max(Number(slideNumber) || 1, 1);
+    if (typeof window.showSlide === 'function') {
+      window.showSlide(requestedSlide);
+      return;
+    }
+
+    const slides = getSlides();
+    slides.forEach((slide, index) => {
+      slide.classList.toggle('active', index === requestedSlide - 1);
+    });
+
+    const progressFill = document.getElementById('progressFill') || document.getElementById('progressBar');
+    if (progressFill) {
+      progressFill.style.width = ((requestedSlide / getTotalSlides()) * 100) + '%';
+    }
+
+    const slideLabel = document.getElementById('slideLabel');
+    if (slideLabel) {
+      slideLabel.textContent = 'Slide ' + requestedSlide + ' of ' + getTotalSlides();
+    }
+
+    reportSlideChange();
+  }
+
+  function patchFunction(functionName, afterHook) {
+    if (typeof window[functionName] !== 'function' || window[functionName].__portalBridgePatched) {
+      return;
+    }
+
+    const original = window[functionName];
+    const patched = function (...args) {
+      const result = original.apply(this, args);
+      setTimeout(afterHook, 0);
+      return result;
+    };
+
+    patched.__portalBridgePatched = true;
+    window[functionName] = patched;
+  }
+
+  function setupHomeTrigger() {
+    const homeTrigger = document.querySelector('.grc-owl');
+    if (!homeTrigger || homeTrigger.__portalHomeBound) {
+      return;
+    }
+
+    homeTrigger.__portalHomeBound = true;
+    homeTrigger.addEventListener('click', function () {
+      postToParent({ type: 'goHome' });
+    });
+  }
+
+  function setupRestoreStateListener() {
+    if (window.__portalRestoreListenerBound) {
+      return;
+    }
+
+    window.__portalRestoreListenerBound = true;
+    window.addEventListener('message', function (event) {
+      if (!event.data || typeof event.data !== 'object') {
+        return;
+      }
+
+      if (event.data.type === 'restoreState') {
+        const targetSlide = Math.max(Number(event.data.slide) || 1, 1);
+        setTimeout(function () {
+          applySlideState(targetSlide);
+        }, 40);
+      }
+    });
+  }
+
+  function initTrackingBridge() {
+    patchFunction('showSlide', reportSlideChange);
+    patchFunction('nextSlide', reportSlideChange);
+    patchFunction('prevSlide', reportSlideChange);
+    patchFunction('previousSlide', reportSlideChange);
+    patchFunction('completeTraining', reportCompletion);
+    patchFunction('completeModule', reportCompletion);
+    patchFunction('finishTraining', reportCompletion);
+    setupHomeTrigger();
+    setupRestoreStateListener();
+
+    const requestedSlide = Number(new URLSearchParams(window.location.search).get('slide') || '');
+    if (requestedSlide > 1) {
+      setTimeout(function () {
+        applySlideState(requestedSlide);
+      }, 60);
+    } else {
+      setTimeout(reportSlideChange, 60);
+    }
+
+    if (typeof MutationObserver === 'function') {
+      const observer = new MutationObserver(function () {
+        reportSlideChange();
+      });
+      observer.observe(document.body, {
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['class']
+      });
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTrackingBridge, { once: true });
+  } else {
+    initTrackingBridge();
+  }
+
+  window.addEventListener('load', function () {
+    setTimeout(function () {
+      initTrackingBridge();
+      reportSlideChange();
+    }, 120);
+  });
+})();
+</script>`;
+}
+
+function injectPortalTrackingBridge(htmlContent, moduleId) {
+  const source = String(htmlContent || '');
+  if (!source) {
+    return source;
+  }
+
+  if (hasPortalTrackingBridge(source)) {
+    return source;
+  }
+
+  const bridge = buildPortalTrackingBridge(moduleId, countSlidesFromHtml(source));
+  if (/<\/body>/i.test(source)) {
+    return source.replace(/<\/body>/i, `${bridge}\n</body>`);
+  }
+
+  return `${source}\n${bridge}`;
+}
+
+function ensureUploadedModuleTracking(moduleRecord) {
+  const normalizedEntryPath = normalizeEntryPath(moduleRecord?.entryPath);
+  if (!normalizedEntryPath || !normalizedEntryPath.startsWith('uploaded-modules/')) {
+    return;
+  }
+
+  const resolvedEntryPath = path.resolve(appRoot, normalizedEntryPath);
+  if (!fs.existsSync(resolvedEntryPath)) {
+    return;
+  }
+
+  try {
+    const htmlContent = fs.readFileSync(resolvedEntryPath, 'utf8');
+    if (hasPortalTrackingBridge(htmlContent)) {
+      return;
+    }
+
+    const patchedHtml = injectPortalTrackingBridge(htmlContent, moduleRecord.id);
+    fs.writeFileSync(resolvedEntryPath, patchedHtml, 'utf8');
+  } catch (error) {
+    console.warn(`Unable to prepare uploaded module tracking bridge: ${normalizedEntryPath}`, error);
+  }
+}
+
+function getModuleMetadata(moduleRecord) {
+  const resolvedEntryPath = path.resolve(appRoot, moduleRecord.entryPath);
+  let totalSlides = 1;
+
+  try {
+    if (fs.existsSync(resolvedEntryPath)) {
+      const htmlContent = fs.readFileSync(resolvedEntryPath, 'utf8');
+      totalSlides = countSlidesFromHtml(htmlContent);
+    }
+  } catch (error) {
+    console.warn(`Unable to read module HTML for metadata: ${moduleRecord.entryPath}`, error);
+  }
+
+  return {
+    ...moduleRecord,
+    description: getModuleDescription(moduleRecord.title),
+    icon: normalizeModuleIcon(moduleRecord.icon) || getModuleTitleIcon(moduleRecord),
+    totalSlides
   };
 }
 
 function sanitizeModuleRegistry(rawRegistry, fallbackRegistry) {
-  const source = Array.isArray(rawRegistry) ? rawRegistry : fallbackRegistry;
+  const isPersistedArray = Array.isArray(rawRegistry);
+  const source = isPersistedArray ? rawRegistry : fallbackRegistry;
   const seenIds = new Set();
   const sanitized = [];
 
@@ -200,7 +547,11 @@ function sanitizeModuleRegistry(rawRegistry, fallbackRegistry) {
     sanitized.push(normalized);
   }
 
-  return sanitized.length > 0 ? sanitized : fallbackRegistry;
+  if (sanitized.length > 0) {
+    return sanitized;
+  }
+
+  return isPersistedArray ? [] : fallbackRegistry;
 }
 
 function buildAvailabilityDefaults(moduleRegistry) {
@@ -227,13 +578,42 @@ function mergeAvailability(moduleRegistry, persistedAvailability) {
 async function resolveModuleState() {
   const storedRegistry = await getModuleRegistry(defaultModuleRegistry);
   const moduleRegistry = sanitizeModuleRegistry(storedRegistry, defaultModuleRegistry);
+  moduleRegistry.forEach((module) => ensureUploadedModuleTracking(module));
   const persistedAvailability = await getModuleAvailability(buildAvailabilityDefaults(moduleRegistry));
   const moduleAvailability = mergeAvailability(moduleRegistry, persistedAvailability);
 
   return {
-    moduleRegistry,
+    moduleRegistry: moduleRegistry.map((module) => getModuleMetadata(module)),
     moduleAvailability
   };
+}
+
+function createUniqueModuleId(baseId, existingIds) {
+  if (!existingIds.has(baseId)) {
+    return baseId;
+  }
+
+  let counter = 2;
+  while (existingIds.has(`${baseId}-${counter}`)) {
+    counter += 1;
+  }
+
+  return `${baseId}-${counter}`;
+}
+
+function toStoredModuleRecord(module) {
+  return {
+    id: module.id,
+    title: module.title,
+    entryPath: module.entryPath,
+    icon: normalizeModuleIcon(module.icon)
+  };
+}
+
+function isPathInside(basePath, targetPath) {
+  const normalizedBase = `${path.resolve(basePath)}${path.sep}`;
+  const normalizedTarget = path.resolve(targetPath);
+  return normalizedTarget.startsWith(normalizedBase);
 }
 
 function parseCookies(req) {
@@ -615,7 +995,10 @@ app.post('/api/v1/admin/modules', requireAdminToken, requireCsrfToken, async (re
       return res.status(409).json({ error: 'A module with this id already exists' });
     }
 
-    const nextRegistry = [...moduleRegistry, normalizedModule];
+    const nextRegistry = [
+      ...moduleRegistry.map(toStoredModuleRecord),
+      normalizedModule
+    ];
     const nextAvailability = {
       ...moduleAvailability,
       [normalizedModule.id]: true
@@ -627,13 +1010,120 @@ app.post('/api/v1/admin/modules', requireAdminToken, requireCsrfToken, async (re
     ]);
 
     return res.status(201).json({
-      module: normalizedModule,
-      modules: nextRegistry,
+      module: getModuleMetadata(normalizedModule),
+      modules: nextRegistry.map((module) => getModuleMetadata(module)),
       moduleAvailability: nextAvailability
     });
   } catch (error) {
     console.error('Failed to register module:', error);
     return res.status(500).json({ error: 'Failed to register module' });
+  }
+});
+
+app.post('/api/v1/admin/modules/upload', requireAdminToken, requireCsrfToken, async (req, res) => {
+  const title = normalizeString(req.body?.title);
+  const icon = normalizeModuleIcon(req.body?.icon);
+  const originalFileName = normalizeString(req.body?.fileName);
+  const htmlContent = String(req.body?.htmlContent || '');
+
+  if (!title || !originalFileName || !htmlContent) {
+    return res.status(400).json({ error: 'title, fileName, and htmlContent are required' });
+  }
+
+  if (!originalFileName.toLowerCase().endsWith('.html')) {
+    return res.status(400).json({ error: 'Only .html files are supported' });
+  }
+
+  const baseId = slugifyModuleId(title);
+  if (!baseId) {
+    return res.status(400).json({ error: 'Unable to derive a valid module id from the title' });
+  }
+
+  try {
+    const { moduleRegistry, moduleAvailability } = await resolveModuleState();
+    const existingIds = new Set(moduleRegistry.map((module) => module.id));
+    const moduleId = createUniqueModuleId(baseId, existingIds);
+    const moduleFolderRelative = path.join('uploaded-modules', moduleId);
+    const moduleFolderAbsolute = path.join(appRoot, moduleFolderRelative);
+    const entryPath = path.join(moduleFolderRelative, 'module.html').replace(/\\/g, '/');
+
+    fs.mkdirSync(moduleFolderAbsolute, { recursive: true });
+    const preparedHtml = injectPortalTrackingBridge(htmlContent, moduleId);
+    fs.writeFileSync(path.join(moduleFolderAbsolute, 'module.html'), preparedHtml, 'utf8');
+
+    const normalizedModule = normalizeModuleRecord({
+      id: moduleId,
+      title,
+      entryPath,
+      icon
+    });
+
+    const nextRegistry = [...moduleRegistry.map(toStoredModuleRecord), normalizedModule];
+    const nextAvailability = {
+      ...moduleAvailability,
+      [normalizedModule.id]: true
+    };
+
+    await Promise.all([
+      setModuleRegistry(nextRegistry),
+      setModuleAvailability(nextAvailability)
+    ]);
+
+    return res.status(201).json({
+      module: getModuleMetadata(normalizedModule),
+      modules: nextRegistry.map((module) => getModuleMetadata(module)),
+      moduleAvailability: nextAvailability
+    });
+  } catch (error) {
+    console.error('Failed to upload module:', error);
+    return res.status(500).json({ error: 'Failed to upload module' });
+  }
+});
+
+app.delete('/api/v1/admin/modules/:moduleId', requireAdminToken, requireCsrfToken, async (req, res) => {
+  const moduleId = normalizeModuleId(req.params.moduleId);
+  if (!moduleId) {
+    return res.status(400).json({ error: 'Invalid module id' });
+  }
+
+  try {
+    const { moduleRegistry, moduleAvailability } = await resolveModuleState();
+    const moduleToDelete = moduleRegistry.find((module) => module.id === moduleId);
+    if (!moduleToDelete) {
+      return res.status(404).json({ error: 'Module not found' });
+    }
+
+    const nextRegistry = moduleRegistry
+      .filter((module) => module.id !== moduleId)
+      .map(toStoredModuleRecord);
+
+    const nextAvailability = { ...moduleAvailability };
+    delete nextAvailability[moduleId];
+
+    const uploadedModulesRoot = path.join(appRoot, 'uploaded-modules');
+    const moduleEntryAbsolute = path.resolve(appRoot, moduleToDelete.entryPath);
+    const moduleFolderAbsolute = path.dirname(moduleEntryAbsolute);
+    const shouldDeleteFiles =
+      isPathInside(uploadedModulesRoot, moduleEntryAbsolute) &&
+      path.basename(moduleEntryAbsolute).toLowerCase() === 'module.html';
+
+    if (shouldDeleteFiles && fs.existsSync(moduleFolderAbsolute)) {
+      fs.rmSync(moduleFolderAbsolute, { recursive: true, force: true });
+    }
+
+    await Promise.all([
+      setModuleRegistry(nextRegistry),
+      setModuleAvailability(nextAvailability)
+    ]);
+
+    return res.status(200).json({
+      deletedModuleId: moduleId,
+      modules: nextRegistry.map((module) => getModuleMetadata(module)),
+      moduleAvailability: nextAvailability
+    });
+  } catch (error) {
+    console.error('Failed to delete module:', error);
+    return res.status(500).json({ error: 'Failed to delete module' });
   }
 });
 

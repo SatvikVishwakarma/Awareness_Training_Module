@@ -1,0 +1,1594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GRC Engineering: Insider Threat Awareness Training</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    
+:root {
+  --primary-blue:#2563EB;
+  --light-blue:#EAF2FF;
+  --dark-blue:#0F2550;
+  --primary-teal:#0D9488;
+  --light-teal:#E6FFFB;
+  --dark-teal:#115E59;
+  --off-black:#0F172A;
+  --white:#FFFFFF;
+  --success-green:#16A34A;
+  --warning-amber:#D97706;
+  --error-red:#DC2626;
+  --neutral-gray:#55647D;
+  --light-gray:#F3F7FF;
+  --medium-gray:#D7E2F2;
+  --border:#D7E2F2;
+  --primary-gradient: linear-gradient(135deg, #2563EB 0%, #0D9488 100%);
+}
+
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #060d1f;
+      color: var(--off-black);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background:
+    radial-gradient(circle at 15% 50%, rgba(26,86,219,0.18) 0%, transparent 55%),
+    radial-gradient(circle at 85% 80%, rgba(8,145,178,0.13) 0%, transparent 50%),
+    radial-gradient(circle at 50% 10%, rgba(30,58,95,0.2) 0%, transparent 50%);
+  z-index: -1;
+}
+
+
+    .module-container {
+      background: var(--white);
+      border-radius: 18px;
+      box-shadow: 0 12px 50px rgba(120,0,0,.35);
+      max-width: 1100px;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ── HEADER ── */
+    .grc-header {
+      background: var(--primary-gradient);
+      padding: 20px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--white);
+      position: relative;
+      overflow: hidden;
+    }
+    .grc-header::after {
+      content: '';
+      position: absolute;
+      top: -60%; right: -8%;
+      width: 280px; height: 280px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 50%;
+    }
+    .grc-logo {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-weight: 700;
+      font-size: 20px;
+      z-index: 2;
+    }
+    .grc-owl {
+      width: 48px; height: 48px;
+      background: var(--white);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      animation: bounce 2s ease-in-out infinite;
+      cursor: pointer;
+      transition: transform 0.2s ease;
+    }
+    .grc-owl:hover { transform: rotate(10deg) scale(1.1); }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-5px); }
+    }
+    .header-meta {
+      text-align: right;
+      z-index: 2;
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .header-meta strong { display: block; font-size: 16px; opacity: 1; }
+
+    /* ── PROGRESS ── */
+    .progress-bar {
+      height: 6px;
+      background: #E2E8F0;
+      position: relative;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary-blue), var(--primary-teal));
+      width: 0%;
+      transition: width .5s ease;
+      box-shadow: 0 0 16px rgba(185,28,28,0.5);
+    }
+
+    /* ── SLIDES ── */
+    .slide {
+      padding: 52px 48px;
+      min-height: 580px;
+      display: none;
+      animation: slideIn .4s ease;
+      position: relative;
+    }
+    .slide.active { display: block; }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateX(28px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    h1 {
+      color: var(--dark-blue);
+      font-size: 2.4rem;
+      font-weight: 800;
+      margin-bottom: 26px;
+      text-align: center;
+      line-height: 1.2;
+      background: linear-gradient(135deg, var(--dark-blue), var(--primary-blue));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    h2 {
+      color: var(--dark-blue);
+      font-size: 1.9rem;
+      font-weight: 700;
+      margin-bottom: 22px;
+    }
+    p { font-size: 1.1rem; margin-bottom: 18px; color: var(--off-black); }
+
+    /* ── GRID CARDS ── */
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 18px;
+      margin: 28px 0;
+    }
+    .info-card {
+      background: linear-gradient(135deg, #fff 0%, #fff8f8 100%);
+      padding: 24px;
+      border-radius: 14px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+      transition: all 0.3s ease;
+      border: 1px solid rgba(185,28,28,0.12);
+    }
+    .info-card:hover {
+      box-shadow: 0 8px 24px rgba(185,28,28,0.15);
+      border-color: rgba(185,28,28,0.3);
+      transform: translateY(-3px);
+    }
+    .info-card-icon { font-size: 32px; margin-bottom: 12px; display: block; }
+    .info-card h3 { color: var(--primary-blue); font-size: 17px; margin-bottom: 8px; font-weight: 600; }
+    .info-card p { font-size: 14px; color: #555; margin: 0; line-height: 1.55; }
+
+    /* ── THREAT TYPE CARDS ── */
+    .threat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 28px 0;
+    }
+    .threat-card {
+      border-radius: 14px;
+      padding: 26px;
+      border: 2px solid transparent;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .threat-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0;
+      width: 5px; height: 100%;
+    }
+    .threat-card.malicious { background: #fff5f5; border-color: rgba(220,38,38,0.2); }
+    .threat-card.malicious::before { background: #DC2626; }
+    .threat-card.negligent { background: #fffbeb; border-color: rgba(217,119,6,0.2); }
+    .threat-card.negligent::before { background: #D97706; }
+    .threat-card.compromised { background: #f5f3ff; border-color: rgba(109,40,217,0.2); }
+    .threat-card.compromised::before { background: #7C3AED; }
+    .threat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(0,0,0,0.12); }
+    .threat-card h3 { font-size: 17px; font-weight: 700; margin-bottom: 10px; margin-left: 6px; }
+    .threat-card.malicious h3 { color: #991B1B; }
+    .threat-card.negligent h3 { color: #92400E; }
+    .threat-card.compromised h3 { color: #4C1D95; }
+    .threat-card p { font-size: 14px; color: #444; margin: 0 0 14px 6px; }
+    .threat-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 99px;
+      font-size: 12px;
+      font-weight: 600;
+      margin: 3px;
+    }
+
+    /* ── VISUAL DEMO BLOCK ── */
+    .visual-demo {
+      background: linear-gradient(135deg, #fff8f8 0%, rgba(245,158,11,0.06) 100%);
+      padding: 30px;
+      border-radius: 14px;
+      margin: 28px 0;
+      border: 2px solid rgba(185,28,28,0.12);
+      box-shadow: 0 4px 12px rgba(185,28,28,0.06);
+    }
+
+    /* ── NAVIGATION ── */
+    .navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 36px;
+      padding-top: 28px;
+      border-top: 1px solid var(--border);
+    }
+    .slide-counter {
+      color: var(--neutral-gray);
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      background: var(--primary-gradient);
+      color: var(--white);
+      padding: 13px 26px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .3s ease;
+      margin: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      width: 0; height: 0;
+      background: rgba(255,255,255,0.2);
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+      transition: width 0.5s ease, height 0.5s ease;
+    }
+    .btn:hover::before { width: 300px; height: 300px; }
+    .btn:hover { box-shadow: 0 6px 20px rgba(185,28,28,.35); transform: translateY(-2px); }
+    .btn:disabled { opacity: 0.45; cursor: not-allowed; transform: none; box-shadow: none; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--primary-blue);
+      border: 2px solid var(--primary-blue);
+    }
+    .btn-secondary:hover { background: var(--light-blue); border-color: var(--dark-blue); color: var(--dark-blue); box-shadow: none; }
+    .btn-success { background: linear-gradient(135deg, #15803D, #22C55E); }
+    .btn-warning { background: linear-gradient(135deg, #D97706, #F59E0B); }
+
+    /* ── FEEDBACK ── */
+    .feedback {
+      padding: 16px 20px;
+      border-radius: 10px;
+      margin-top: 18px;
+      font-size: 15px;
+      display: none;
+      line-height: 1.55;
+    }
+    .feedback.correct { background: var(--success-light); color: #14532d; border: 2px solid #16A34A; }
+    .feedback.incorrect { background: var(--error-light); color: #7f1d1d; border: 2px solid #DC2626; }
+    .feedback.warning { background: var(--warning-light); color: #78350f; border: 2px solid #D97706; }
+
+    /* ── ACHIEVEMENT POPUP ── */
+    .achievement {
+      position: fixed;
+      top: 20px; right: -340px;
+      background: #fff;
+      padding: 16px 22px;
+      border-radius: 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: right 0.5s cubic-bezier(.34,1.56,.64,1);
+      z-index: 1000;
+      border-left: 5px solid var(--primary-blue);
+      min-width: 300px;
+    }
+    .achievement.show { right: 20px; }
+    .achievement-icon { font-size: 32px; animation: celebrate 0.5s ease; }
+    .achievement-text strong { display: block; font-size: 15px; color: var(--dark-blue); }
+    .achievement-text span { font-size: 13px; color: #555; }
+    @keyframes celebrate {
+      0% { transform: scale(0) rotate(0); }
+      50% { transform: scale(1.3) rotate(180deg); }
+      100% { transform: scale(1) rotate(360deg); }
+    }
+
+    /* ── CONFETTI ── */
+    .confetti-container {
+      position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+      z-index: 9999;
+    }
+    .confetti {
+      position: absolute;
+      width: 10px; height: 10px;
+      animation: confettiFall 3s linear;
+    }
+    @keyframes confettiFall {
+      0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+    }
+
+    /* ── SLIDE 1: WELCOME ── */
+    .welcome-hero {
+      background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+      border: 2px solid rgba(185,28,28,0.15);
+      border-radius: 18px;
+      padding: 36px;
+      margin-bottom: 28px;
+      box-shadow: 0 8px 28px rgba(185,28,28,0.1);
+      display: flex;
+      align-items: center;
+      gap: 32px;
+    }
+    .welcome-hero-icon { font-size: 72px; flex-shrink: 0; }
+    .welcome-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin: 24px 0;
+    }
+    .welcome-stat {
+      background: linear-gradient(135deg, #fff 0%, #fff8f8 100%);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 1px solid rgba(185,28,28,0.12);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+    }
+    .welcome-stat .stat-number {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--primary-blue);
+      display: block;
+    }
+    .welcome-stat .stat-label {
+      font-size: 13px;
+      color: #555;
+      line-height: 1.4;
+    }
+
+    /* ── SLIDE 3: DATA THEFT INDICATORS ── */
+    .indicator-list {
+      display: grid;
+      gap: 14px;
+      margin: 24px 0;
+    }
+    .indicator-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      padding: 18px 20px;
+      background: #fff8f8;
+      border-radius: 10px;
+      border-left: 4px solid var(--primary-blue);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+      transition: all 0.2s ease;
+    }
+    .indicator-item:hover { transform: translateX(4px); box-shadow: 0 4px 12px rgba(185,28,28,0.1); }
+    .indicator-item.amber { border-left-color: var(--warning); background: #fffbeb; }
+    .indicator-item.purple { border-left-color: #7C3AED; background: #f5f3ff; }
+    .indicator-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+    .indicator-body strong { display: block; font-size: 15px; color: var(--off-black); margin-bottom: 4px; }
+    .indicator-body span { font-size: 13px; color: #555; }
+
+    /* ── SLIDE 4: REPORTING ── */
+    .reporting-steps {
+      display: grid;
+      gap: 14px;
+      margin: 24px 0;
+    }
+    .reporting-step {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 20px 24px;
+      background: linear-gradient(135deg, #fff 0%, #fff8f8 100%);
+      border-radius: 12px;
+      border: 1px solid rgba(185,28,28,0.12);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.07);
+      transition: all 0.3s ease;
+    }
+    .reporting-step:hover { transform: translateX(6px); box-shadow: 0 6px 18px rgba(185,28,28,0.12); }
+    .step-number {
+      width: 42px; height: 42px;
+      background: var(--primary-gradient);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+    .step-content strong { display: block; font-size: 16px; color: var(--dark-blue); margin-bottom: 4px; }
+    .step-content span { font-size: 14px; color: #555; }
+
+    /* ── SCENARIO SECTION ── */
+    .scenario-card {
+      background: #f8fafc;
+      padding: 26px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      border: 2px solid #e2e8f0;
+      transition: border-color 0.2s ease;
+    }
+    .scenario-card:hover { border-color: rgba(185,28,28,0.25); }
+    .scenario-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
+    }
+    .scenario-icon { font-size: 36px; flex-shrink: 0; }
+    .scenario-card h3 { color: var(--dark-blue); font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .scenario-card .scenario-desc {
+      font-style: italic;
+      color: #374151;
+      font-size: 15px;
+      margin-bottom: 0;
+      background: white;
+      padding: 16px;
+      border-radius: 8px;
+      border-left: 3px solid var(--primary-blue);
+    }
+    .scenario-options { display: grid; gap: 10px; margin-top: 18px; }
+    .scenario-options button {
+      text-align: left;
+      padding: 14px 18px;
+      font-size: 14px;
+      font-family: inherit;
+      background: white;
+      color: var(--off-black);
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+    .scenario-options button:hover:not(:disabled) { border-color: var(--primary-blue); background: var(--light-blue); color: var(--dark-blue); }
+    .scenario-options button.correct { background: var(--success-light); border-color: #16A34A; color: #14532d; }
+    .scenario-options button.incorrect { background: var(--error-light); border-color: #DC2626; color: #7f1d1d; }
+    .scenario-summary {
+      background: linear-gradient(135deg, #fff8f8, #fffbeb);
+      border: 2px solid rgba(185,28,28,0.2);
+      border-radius: 14px;
+      padding: 28px;
+      margin-top: 24px;
+      display: none;
+      text-align: center;
+    }
+    .scenario-summary h3 { color: var(--dark-blue); font-size: 20px; margin-bottom: 10px; }
+    .scenario-summary .score { font-size: 2.5rem; font-weight: 800; color: var(--primary-blue); }
+
+    /* ── SLIDE 5: COWORKER JUDGMENT GAME ── */
+    .judgment-scenario {
+      background: white;
+      border-radius: 16px;
+      border: 2px solid #e2e8f0;
+      padding: 28px;
+      margin: 20px 0;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+    }
+    .judgment-scenario .persona {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+    .persona-avatar {
+      width: 52px; height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      flex-shrink: 0;
+    }
+    .persona-info strong { display: block; font-size: 16px; color: var(--off-black); }
+    .persona-info span { font-size: 13px; color: var(--neutral-gray); }
+    .behavior-list {
+      list-style: none;
+      margin: 0 0 20px 0;
+    }
+    .behavior-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: 15px;
+      color: #374151;
+      border-bottom: 1px solid #f1f5f9;
+    }
+    .behavior-list li:last-child { border-bottom: none; }
+    .behavior-bullet { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+    .judgment-buttons { display: flex; gap: 12px; }
+    .judge-btn {
+      flex: 1;
+      padding: 14px 20px;
+      border: 2px solid;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+    .judge-btn.report { background: var(--error-light); border-color: var(--error); color: #7f1d1d; }
+    .judge-btn.report:hover:not(:disabled) { background: var(--error); color: white; }
+    .judge-btn.monitor { background: var(--warning-light); border-color: var(--warning); color: #78350f; }
+    .judge-btn.monitor:hover:not(:disabled) { background: var(--warning); color: white; }
+    .judge-btn.ignore { background: var(--success-light); border-color: #16A34A; color: #14532d; }
+    .judge-btn.ignore:hover:not(:disabled) { background: #16A34A; color: white; }
+    .judge-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+    .judgment-feedback {
+      margin-top: 16px;
+      padding: 16px 20px;
+      border-radius: 10px;
+      display: none;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .judgment-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+    .judgment-counter {
+      font-size: 14px;
+      color: var(--neutral-gray);
+      font-weight: 500;
+    }
+    .judgment-score-display {
+      background: var(--primary-gradient);
+      color: white;
+      padding: 8px 18px;
+      border-radius: 99px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    /* ── SLIDE 6: QUIZ ── */
+    .quiz-question {
+      background: #f8fafc;
+      border-radius: 14px;
+      padding: 28px;
+      margin: 24px 0;
+      border: 2px solid #e2e8f0;
+    }
+    .quiz-question h3 { color: var(--dark-blue); font-size: 18px; margin-bottom: 20px; line-height: 1.4; }
+    .quiz-options { display: grid; gap: 10px; }
+    .quiz-options button {
+      text-align: left;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-family: inherit;
+      background: white;
+      color: var(--off-black);
+      border: 2px solid #d1d5db;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      line-height: 1.4;
+    }
+    .quiz-options button:hover:not(:disabled) { border-color: var(--primary-blue); background: var(--light-blue); }
+    .quiz-options button.correct { background: var(--success-light); border-color: #16A34A; color: #14532d; font-weight: 600; }
+    .quiz-options button.incorrect { background: var(--error-light); border-color: #DC2626; color: #7f1d1d; }
+    .quiz-progress-dots {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      justify-content: center;
+    }
+    .q-dot {
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      transition: all 0.3s ease;
+    }
+    .q-dot.active { background: var(--primary-blue); transform: scale(1.2); }
+    .q-dot.done-correct { background: #16A34A; }
+    .q-dot.done-incorrect { background: #DC2626; }
+
+    /* ── FINAL SLIDE ── */
+    .final-card {
+      background: linear-gradient(135deg, #fff 0%, #fff5f5 100%);
+      border-radius: 18px;
+      padding: 40px;
+      text-align: center;
+      border: 2px solid rgba(185,28,28,0.18);
+      box-shadow: 0 8px 32px rgba(185,28,28,0.12);
+      margin-bottom: 24px;
+    }
+    .final-badge {
+      font-size: 72px;
+      margin-bottom: 16px;
+      display: block;
+      animation: badgePop 0.8s cubic-bezier(.34,1.56,.64,1);
+    }
+    @keyframes badgePop {
+      0% { transform: scale(0); }
+      100% { transform: scale(1); }
+    }
+    .final-score {
+      font-size: 3rem;
+      font-weight: 900;
+      background: var(--primary-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin: 8px 0;
+    }
+    .takeaways {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .takeaway {
+      background: white;
+      border-radius: 10px;
+      padding: 18px;
+      border: 1px solid rgba(185,28,28,0.12);
+      text-align: left;
+      font-size: 14px;
+      color: #374151;
+    }
+    .takeaway strong { display: block; color: var(--dark-blue); margin-bottom: 4px; font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<div class="confetti-container" id="confettiContainer"></div>
+<div class="achievement" id="achievement">
+  <div class="achievement-icon" id="achIcon"></div>
+  <div class="achievement-text">
+    <strong id="achTitle"></strong>
+    <span id="achDesc"></span>
+  </div>
+</div>
+
+<div class="module-container">
+  <!-- HEADER -->
+  <div class="grc-header">
+    <div class="grc-logo">
+      <div class="grc-owl">🦉</div>
+      <div>
+        <div style="font-size:12px;opacity:0.8;font-weight:400;">GRC Engineering</div>
+        Insider Threat Awareness
+      </div>
+    </div>
+    <div class="header-meta">
+      <strong>Security Awareness Training</strong>
+      <span id="slideLabel">Slide 1 of 8</span>
+    </div>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+  <!-- ═══════════════ SLIDE 1: WELCOME ═══════════════ -->
+  <div class="slide active" id="slide1">
+    <h1>🔍 Insider Threat Awareness</h1>
+
+    <div class="welcome-hero">
+      <div class="welcome-hero-icon">🏢</div>
+      <div>
+        <p style="font-size:1.15rem; margin-bottom:14px;">Not every threat comes from outside the organization. <strong>Insider threats</strong> — whether malicious, negligent, or compromised — are among the most damaging and hardest to detect.</p>
+        <p style="font-size:1rem; color:#555; margin:0;">This training will help you identify the signs, understand the types of insiders, and know exactly when and how to report suspicious behavior.</p>
+      </div>
+    </div>
+
+    <div class="welcome-stat-grid">
+      <div class="welcome-stat">
+        <span class="stat-number">60%</span>
+        <span class="stat-label">of cyber incidents involve an insider element</span>
+      </div>
+      <div class="welcome-stat">
+        <span class="stat-number">$15M</span>
+        <span class="stat-label">average annual cost of insider threats to organizations</span>
+      </div>
+      <div class="welcome-stat">
+        <span class="stat-number">77</span>
+        <span class="stat-label">days average time to contain an insider incident</span>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card"><span class="info-card-icon">😈</span><h3>Malicious Insiders</h3><p>Employees or contractors who intentionally misuse authorized access to cause harm.</p></div>
+      <div class="info-card"><span class="info-card-icon">🤦</span><h3>Negligent Employees</h3><p>Well-meaning staff whose careless actions expose data or create security gaps.</p></div>
+      <div class="info-card"><span class="info-card-icon">🔓</span><h3>Compromised Accounts</h3><p>Legitimate user credentials stolen or hijacked by external attackers.</p></div>
+    </div>
+
+    <div class="navigation">
+      <div></div>
+      <div class="slide-counter">1 of 8</div>
+      <button class="btn" onclick="nextSlide()">Get Started →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 2: THREAT TYPES ═══════════════ -->
+  <div class="slide" id="slide2">
+    <h2>⚠️ The Three Types of Insider Threats</h2>
+    <p>Understanding <em>why</em> insiders act — intentional, accidental, or manipulated — is key to recognizing the warning signs.</p>
+
+    <div class="threat-grid">
+      <div class="threat-card malicious">
+        <h3>😈 Malicious Insider</h3>
+        <p>An authorized user who deliberately misuses their access for personal gain, revenge, or to aid an external party.</p>
+        <div>
+          <span class="threat-tag" style="background:#fee2e2;color:#991B1B;">Disgruntled employee</span>
+          <span class="threat-tag" style="background:#fee2e2;color:#991B1B;">Termination pending</span>
+          <span class="threat-tag" style="background:#fee2e2;color:#991B1B;">Financial pressure</span>
+          <span class="threat-tag" style="background:#fee2e2;color:#991B1B;">Recruited spy</span>
+        </div>
+        <div style="margin-top:14px; padding:12px; background:white; border-radius:8px; font-size:13px; color:#555;">
+          <strong style="color:#991B1B;">Example:</strong> A departing engineer downloads the full customer database the week before their last day.
+        </div>
+      </div>
+      <div class="threat-card negligent">
+        <h3>🤦 Negligent Employee</h3>
+        <p>An employee who bypasses security policies or makes careless mistakes — not intending harm, but causing it anyway.</p>
+        <div>
+          <span class="threat-tag" style="background:#fef3c7;color:#92400E;">Phishing victim</span>
+          <span class="threat-tag" style="background:#fef3c7;color:#92400E;">Policy shortcuts</span>
+          <span class="threat-tag" style="background:#fef3c7;color:#92400E;">Weak passwords</span>
+          <span class="threat-tag" style="background:#fef3c7;color:#92400E;">Lost devices</span>
+        </div>
+        <div style="margin-top:14px; padding:12px; background:white; border-radius:8px; font-size:13px; color:#555;">
+          <strong style="color:#92400E;">Example:</strong> An employee emails a sensitive report to their personal Gmail "just to finish it at home."
+        </div>
+      </div>
+      <div class="threat-card compromised">
+        <h3>🔓 Compromised Account</h3>
+        <p>A legitimate user's credentials have been stolen or hijacked. The account is active — but the attacker is in control.</p>
+        <div>
+          <span class="threat-tag" style="background:#ede9fe;color:#4C1D95;">Credential stuffing</span>
+          <span class="threat-tag" style="background:#ede9fe;color:#4C1D95;">Phishing</span>
+          <span class="threat-tag" style="background:#ede9fe;color:#4C1D95;">Social engineering</span>
+          <span class="threat-tag" style="background:#ede9fe;color:#4C1D95;">Malware</span>
+        </div>
+        <div style="margin-top:14px; padding:12px; background:white; border-radius:8px; font-size:13px; color:#555;">
+          <strong style="color:#4C1D95;">Example:</strong> A manager's account suddenly accesses file shares it has never touched before, at 2 AM from a foreign IP.
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+      <div class="slide-counter">2 of 8</div>
+      <button class="btn" onclick="nextSlide()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 3: DATA THEFT INDICATORS ═══════════════ -->
+  <div class="slide" id="slide3">
+    <h2>🔎 Data Theft Indicators</h2>
+    <p>Insider data theft rarely happens in a single action. Watch for <strong>patterns of behavior</strong> — any single indicator may be innocent, but combinations raise red flags.</p>
+
+    <div class="indicator-list">
+      <div class="indicator-item">
+        <div class="indicator-icon">📤</div>
+        <div class="indicator-body">
+          <strong>Unusual volume of data transfers</strong>
+          <span>Large file downloads, uploads to personal cloud storage (Dropbox, Google Drive), or emailing files externally — especially outside business hours.</span>
+        </div>
+      </div>
+      <div class="indicator-item amber">
+        <div class="indicator-icon">🕐</div>
+        <div class="indicator-body">
+          <strong>After-hours access</strong>
+          <span>Logging in at unusual hours (late nights, weekends) or from unusual locations, particularly if not consistent with job requirements.</span>
+        </div>
+      </div>
+      <div class="indicator-item">
+        <div class="indicator-icon">🗂️</div>
+        <div class="indicator-body">
+          <strong>Accessing files outside job scope</strong>
+          <span>A marketing employee accessing HR salary data, or a developer querying customer PII tables they've never touched before.</span>
+        </div>
+      </div>
+      <div class="indicator-item amber">
+        <div class="indicator-icon">🖨️</div>
+        <div class="indicator-body">
+          <strong>Excessive printing or copying</strong>
+          <span>Printing sensitive documents in bulk, bringing USB drives to work, or taking screenshots of restricted screens.</span>
+        </div>
+      </div>
+      <div class="indicator-item purple">
+        <div class="indicator-icon">😤</div>
+        <div class="indicator-body">
+          <strong>Behavioral changes before departure</strong>
+          <span>Employees who gave notice, were passed over for promotions, or are under performance review accessing or downloading more data than usual.</span>
+        </div>
+      </div>
+      <div class="indicator-item purple">
+        <div class="indicator-icon">🔑</div>
+        <div class="indicator-body">
+          <strong>Credential sharing or privilege abuse</strong>
+          <span>Sharing login credentials with others, requesting unnecessary access rights, or using a colleague's account to access restricted areas.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+      <div class="slide-counter">3 of 8</div>
+      <button class="btn" onclick="nextSlide()">Next →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 4: REPORTING ═══════════════ -->
+  <div class="slide" id="slide4">
+    <h2>📢 Reporting Suspicious Behavior</h2>
+    <p>One of the most effective defenses against insider threats is a culture where employees feel safe and empowered to speak up. <strong>When in doubt, report it.</strong></p>
+
+    <div class="visual-demo" style="margin-bottom:24px;">
+      <p style="font-weight:700; color:var(--dark-blue); font-size:1.1rem; margin-bottom:8px;">⚖️ The Bystander Dilemma</p>
+      <p style="font-size:14px; margin:0; color:#444;">Many employees witness suspicious behavior but don't report it — fearing they're wrong, it's not their place, or they'll harm a colleague. Remember: you're <strong>not accusing anyone of a crime</strong>. You're providing information that lets trained professionals assess the situation.</p>
+    </div>
+
+    <div class="reporting-steps">
+      <div class="reporting-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <strong>Document what you observed</strong>
+          <span>Note the who, what, when, and where. Screenshots, timestamps, and specific details are more valuable than vague impressions.</span>
+        </div>
+      </div>
+      <div class="reporting-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <strong>Do not confront the individual</strong>
+          <span>Confronting a potential insider can trigger data destruction, retaliation, or flight. Leave investigation to security professionals.</span>
+        </div>
+      </div>
+      <div class="reporting-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <strong>Report through official channels</strong>
+          <span>Use your company's security hotline, anonymous tip line, or report directly to your security team or HR. Use established processes, not informal Slack messages.</span>
+        </div>
+      </div>
+      <div class="reporting-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <strong>Protect confidentiality</strong>
+          <span>Don't discuss what you saw with coworkers. This could tip off the subject, contaminate the investigation, or create legal exposure for you.</span>
+        </div>
+      </div>
+      <div class="reporting-step">
+        <div class="step-number">5</div>
+        <div class="step-content">
+          <strong>Cooperate with the investigation</strong>
+          <span>Be prepared to provide additional information to investigators. Reporters are protected from retaliation under most corporate policies and relevant laws.</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="navigation">
+      <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+      <div class="slide-counter">4 of 8</div>
+      <button class="btn" onclick="nextSlide()">Next: Coworker Scenarios →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 5: WOULD YOU REPORT? ═══════════════ -->
+  <div class="slide" id="slide5">
+    <h2>🤔 Would You Report This Behavior?</h2>
+    <p>For each scenario below, decide whether you would <strong>Report immediately</strong>, <strong>Monitor / keep watching</strong>, or <strong>No action needed</strong>. There may not always be a single right answer — but your reasoning matters.</p>
+
+    <div id="judgmentContainer"></div>
+
+    <div class="navigation">
+      <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+      <div class="slide-counter">5 of 8</div>
+      <button class="btn" id="judgmentNextBtn" onclick="nextSlide()" style="display:none;">Next →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 6: SCENARIOS ═══════════════ -->
+  <div class="slide" id="slide6">
+    <h2>🎯 Real-World Scenarios</h2>
+    <p>For each situation, choose the best response. Think through all options carefully before answering.</p>
+
+    <div id="scenarioContainer"></div>
+
+    <div class="scenario-summary" id="scenarioSummary">
+      <h3>Scenarios Complete!</h3>
+      <div class="score" id="scenarioScore"></div>
+      <p id="scenarioMsg" style="margin-top:12px;"></p>
+    </div>
+
+    <div class="navigation">
+      <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+      <div class="slide-counter">6 of 8</div>
+      <button class="btn" id="scenarioContinueBtn" onclick="nextSlide()" style="display:none;">Continue →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 7: KNOWLEDGE CHECK ═══════════════ -->
+  <div class="slide" id="slide7">
+    <h2>📝 Knowledge Check</h2>
+    <p>Test your understanding of insider threat concepts. Answer all questions to complete the module.</p>
+
+    <div class="quiz-progress-dots" id="quizDots"></div>
+    <div id="quizContainer"></div>
+
+    <div class="navigation">
+      <button class="btn btn-secondary" onclick="prevSlide()">← Back</button>
+      <div class="slide-counter">7 of 8</div>
+      <button class="btn" id="quizContinueBtn" onclick="nextSlide()" style="display:none;">See Results →</button>
+    </div>
+  </div>
+
+  <!-- ═══════════════ SLIDE 8: COMPLETION ═══════════════ -->
+  <div class="slide" id="slide8">
+    <div class="final-card">
+      <span class="final-badge" id="finalBadge">🛡️</span>
+      <h1 style="margin-bottom:8px;">Training Complete!</h1>
+      <div class="final-score" id="finalScore"></div>
+      <p id="finalMsg" style="font-size:1.1rem; color:#555; margin-top:8px;"></p>
+    </div>
+
+    <div class="takeaways">
+      <div class="takeaway"><strong>🔍 Stay Vigilant</strong>Insider threats can come from anyone with access. Trust your instincts when something feels off.</div>
+      <div class="takeaway"><strong>📢 Report Promptly</strong>Early reports prevent far more damage than late ones. It's always better to let investigators decide.</div>
+      <div class="takeaway"><strong>📚 Know the Signs</strong>Unusual data access, behavior changes, and policy violations are all warning signals worth noting.</div>
+      <div class="takeaway"><strong>🤝 You're Protected</strong>Good-faith reports are protected. You won't face retaliation for raising legitimate security concerns.</div>
+    </div>
+
+    <div style="text-align:center; margin-top:28px;">
+      <button class="btn" onclick="restartModule()" style="background:var(--primary-gradient);">🔄 Restart Module</button>
+    </div>
+  </div>
+
+</div><!-- /module-container -->
+
+<script>
+  /* ── STATE ── */
+  let currentSlide = 1;
+  const totalSlides = 8;
+  let quizScore = 0;
+  let quizAnswered = 0;
+  let judgmentScore = 0;
+  let judgmentAnswered = 0;
+  let scenarioCorrect = 0;
+  let scenarioAnswered = 0;
+
+  /* ── NAVIGATION ── */
+  function showSlide(n) {
+    document.querySelectorAll('.slide').forEach(s => s.classList.remove('active'));
+    document.getElementById('slide' + n).classList.add('active');
+    currentSlide = n;
+    document.getElementById('progressFill').style.width = ((n / totalSlides) * 100) + '%';
+    document.getElementById('slideLabel').textContent = 'Slide ' + n + ' of ' + totalSlides;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    if (n === 5) buildJudgment();
+    if (n === 6) buildScenarios();
+    if (n === 7) buildQuiz();
+    if (n === 8) buildFinal();
+  }
+
+  function nextSlide() { if (currentSlide < totalSlides) showSlide(currentSlide + 1); }
+  function prevSlide() { if (currentSlide > 1) showSlide(currentSlide - 1); }
+
+  /* ── ACHIEVEMENT POPUP ── */
+  function showAchievement(icon, title, desc) {
+    const el = document.getElementById('achievement');
+    document.getElementById('achIcon').textContent = icon;
+    document.getElementById('achTitle').textContent = title;
+    document.getElementById('achDesc').textContent = desc;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 3500);
+  }
+
+  /* ── CONFETTI ── */
+  function spawnConfetti() {
+    const container = document.getElementById('confettiContainer');
+    const colors = ['#B91C1C','#F59E0B','#16A34A','#7C3AED','#0EA5E9','#EC4899'];
+    for (let i = 0; i < 80; i++) {
+      const c = document.createElement('div');
+      c.className = 'confetti';
+      c.style.cssText = `
+        left:${Math.random()*100}vw;
+        background:${colors[Math.floor(Math.random()*colors.length)]};
+        border-radius:${Math.random()>0.5?'50%':'2px'};
+        animation-delay:${Math.random()*1.5}s;
+        animation-duration:${2+Math.random()*2}s;
+        width:${6+Math.random()*8}px;
+        height:${6+Math.random()*8}px;
+      `;
+      container.appendChild(c);
+      setTimeout(() => c.remove(), 4500);
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     SLIDE 5 — COWORKER JUDGMENT SCENARIOS
+  ══════════════════════════════════════════════ */
+  const judgmentScenarios = [
+    {
+      name: 'Marcus T.', role: 'Senior Developer', avatar: '👨‍💻', bg: '#EFF6FF',
+      behaviors: [
+        { icon: '📦', text: 'Connected a personal USB drive to his work laptop twice this week' },
+        { icon: '💬', text: 'Complained loudly to a colleague that he was "done with this place"' },
+        { icon: '🕐', text: 'Logged into the codebase repository at 11:45 PM on a Tuesday' },
+      ],
+      correctAction: 'report',
+      feedback: {
+        report: '✅ Correct — Report. Three concerning behaviors together (data exfiltration vector, expressed intent to leave, after-hours access) form a serious pattern. This warrants security team awareness even if each act alone seems minor.',
+        monitor: '⚠️ Monitoring might miss a window. If Marcus is staging data theft, acting quickly matters. Given the combination of signs, a confidential report to security is the right call.',
+        ignore: '❌ This pattern should not be ignored. USB use + dissatisfaction + after-hours access is a recognized insider risk profile. Report promptly.'
+      }
+    },
+    {
+      name: 'Priya S.', role: 'HR Coordinator', avatar: '👩‍💼', bg: '#F0FDF4',
+      behaviors: [
+        { icon: '📋', text: 'Accessed salary spreadsheets she regularly works with as part of her job' },
+        { icon: '💼', text: 'Stayed late several nights to finish a big quarterly report' },
+        { icon: '☕', text: 'Was seen taking coffee to her desk and working through lunch' },
+      ],
+      correctAction: 'ignore',
+      feedback: {
+        report: '❌ These are normal work behaviors for an HR coordinator. Accessing salary data is within her job scope. Over-reporting benign activity erodes trust and wastes security resources.',
+        monitor: '⚠️ There\'s no clear indicator here to warrant heightened monitoring. Staying late to finish work is standard behavior. Reserve monitoring for actual warning signs.',
+        ignore: '✅ Correct — No action needed. Everything described here is consistent with normal job duties and professional dedication. Not every long night or file access is a threat.'
+      }
+    },
+    {
+      name: 'Derek W.', role: 'Finance Analyst', avatar: '👨‍💼', bg: '#FFF7ED',
+      behaviors: [
+        { icon: '📧', text: 'Forwarded a client contract PDF to his Gmail account "for reference"' },
+        { icon: '🤷', text: 'When asked, said "I always do this — it\'s faster to work from my phone"' },
+        { icon: '🔒', text: 'The contract contains confidential pricing and client contact data' },
+      ],
+      correctAction: 'report',
+      feedback: {
+        report: '✅ Correct — Report. Even without malicious intent, this is a data policy violation involving confidential client data. Negligent insiders cause real harm. The security or compliance team needs to address this and ensure the data is removed from personal storage.',
+        monitor: '⚠️ Monitoring isn\'t enough here — the data is already outside the security perimeter. The situation needs immediate action: the security team should remediate and counsel the employee.',
+        ignore: '❌ "I always do it" doesn\'t make it acceptable. Forwarding confidential client data to personal email violates data handling policies and potentially regulations. This must be reported.'
+      }
+    },
+    {
+      name: 'Jess L.', role: 'Product Manager', avatar: '👩‍💻', bg: '#FAF5FF',
+      behaviors: [
+        { icon: '📊', text: 'Requested read access to the engineering database to "understand the data model better"' },
+        { icon: '📝', text: 'The request went through the standard IT access request process' },
+        { icon: '✅', text: 'Her manager approved the request before IT provisioned the access' },
+      ],
+      correctAction: 'ignore',
+      feedback: {
+        report: '❌ This was a legitimate, properly approved access request through official channels. Reporting this could discourage appropriate access requests and harm the employee unfairly.',
+        monitor: '⚠️ A standard approved access request doesn\'t require heightened monitoring. If you later observe unusual activity with that access, then re-evaluate.',
+        ignore: '✅ Correct — No action needed. The request was made openly, followed proper process, and was approved by the appropriate authority. This is the system working as intended.'
+      }
+    },
+  ];
+
+  let currentJudgment = 0;
+
+  function buildJudgment() {
+    const container = document.getElementById('judgmentContainer');
+    if (container.innerHTML.trim()) return;
+    judgmentScore = 0;
+    judgmentAnswered = 0;
+    currentJudgment = 0;
+    renderJudgment(0);
+  }
+
+  function renderJudgment(idx) {
+    const container = document.getElementById('judgmentContainer');
+    const s = judgmentScenarios[idx];
+    container.innerHTML = `
+      <div class="judgment-scenario">
+        <div class="persona">
+          <div class="persona-avatar" style="background:${s.bg};">${s.avatar}</div>
+          <div class="persona-info">
+            <strong>${s.name}</strong>
+            <span>${s.role}</span>
+          </div>
+          <div style="margin-left:auto;" class="judgment-score-display">
+            ${judgmentAnswered}/${judgmentScenarios.length} answered
+          </div>
+        </div>
+        <p style="font-size:14px;color:#555;margin-bottom:12px;font-weight:600;">Observed behaviors:</p>
+        <ul class="behavior-list">
+          ${s.behaviors.map(b => `<li><span class="behavior-bullet">${b.icon}</span>${b.text}</li>`).join('')}
+        </ul>
+        <div class="judgment-buttons">
+          <button class="judge-btn report" id="jBtn-report" onclick="judgeAction('report')">🚨 Report to Security</button>
+          <button class="judge-btn monitor" id="jBtn-monitor" onclick="judgeAction('monitor')">👁️ Monitor Closely</button>
+          <button class="judge-btn ignore" id="jBtn-ignore" onclick="judgeAction('ignore')">✅ No Action Needed</button>
+        </div>
+        <div class="judgment-feedback" id="judgmentFeedback"></div>
+        <div class="judgment-nav" style="display:none;" id="judgmentNav">
+          <span class="judgment-counter">Scenario ${idx+1} of ${judgmentScenarios.length}</span>
+          ${idx < judgmentScenarios.length - 1
+            ? `<button class="btn" onclick="nextJudgment()">Next Scenario →</button>`
+            : `<button class="btn btn-success" onclick="finishJudgments()">Finish Scenarios ✓</button>`}
+        </div>
+      </div>
+    `;
+  }
+
+  function judgeAction(action) {
+    const s = judgmentScenarios[currentJudgment];
+    const fb = document.getElementById('judgmentFeedback');
+    const nav = document.getElementById('judgmentNav');
+    ['report','monitor','ignore'].forEach(a => {
+      const btn = document.getElementById('jBtn-' + a);
+      btn.disabled = true;
+      if (a === s.correctAction) {
+        btn.style.opacity = '1';
+        btn.style.filter = 'brightness(1.1)';
+      } else {
+        btn.style.opacity = '0.4';
+      }
+    });
+    const isCorrect = action === s.correctAction;
+    if (isCorrect) { judgmentScore++; }
+    judgmentAnswered++;
+    fb.style.display = 'block';
+    fb.className = 'judgment-feedback ' + (isCorrect ? 'correct' : (action === 'monitor' ? 'warning' : 'incorrect'));
+    fb.innerHTML = s.feedback[action];
+    nav.style.display = 'flex';
+    if (isCorrect) showAchievement('🎯', 'Good Call!', 'You read the situation correctly.');
+  }
+
+  function nextJudgment() {
+    currentJudgment++;
+    if (currentJudgment < judgmentScenarios.length) {
+      renderJudgment(currentJudgment);
+    }
+  }
+
+  function finishJudgments() {
+    document.getElementById('judgmentNextBtn').style.display = 'inline-flex';
+    const pct = Math.round((judgmentScore / judgmentScenarios.length) * 100);
+    if (pct === 100) {
+      showAchievement('🏆', 'Perfect Judgment!', 'You called every scenario correctly!');
+      spawnConfetti();
+    } else {
+      showAchievement('🎯', 'Judgment Complete', `${judgmentScore}/${judgmentScenarios.length} correct`);
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     SLIDE 6 — REAL-WORLD SCENARIOS
+  ══════════════════════════════════════════════ */
+  const scenarios = [
+    {
+      icon: '🖥️',
+      title: 'The Departing Employee',
+      description: 'Your close colleague just announced they\'re leaving for a competitor in 2 weeks. Today, you notice them downloading a large ZIP file from the shared product roadmap folder and emailing it to an external address. They say it\'s "just my own work samples."',
+      options: [
+        { text: 'It\'s probably fine — they\'ve always been trustworthy. Mind your own business.', correct: false, feedback: '❌ Long tenure doesn\'t change policy. Downloading bulk proprietary data and emailing it externally is a policy violation regardless of intent or history. Report it.' },
+        { text: 'Confront them directly and ask them to delete the file.', correct: false, feedback: '⚠️ Don\'t confront. This can cause the employee to destroy evidence, accelerate exfiltration, or create a hostile situation. Leave investigation to security professionals.' },
+        { text: 'Report what you observed to the security team, including dates, files, and destination address.', correct: true, feedback: '✅ Correct! This is a textbook data exfiltration indicator from a departing employee. Document what you saw specifically and report it. The security team can determine intent — that\'s not your job.' },
+        { text: 'Wait to see if they do it again before deciding.', correct: false, feedback: '❌ Waiting allows more data to leave. If the behavior is already suspicious, document and report it now. You\'re not accusing anyone — you\'re providing information.' },
+      ]
+    },
+    {
+      icon: '🔐',
+      title: 'The Shared Password',
+      description: 'During a busy product launch, your team lead tells you: "Just use my credentials to access the analytics dashboard — I haven\'t had time to get you proper access and we need the numbers now."',
+      options: [
+        { text: 'Use the credentials — it\'s a time crunch and your lead authorized it.', correct: false, feedback: '❌ Credential sharing is prohibited regardless of who authorizes it. It destroys auditability, violates least-privilege principles, and could make you legally liable for your lead\'s account activity.' },
+        { text: 'Use the credentials this once but immediately request your own access after.', correct: false, feedback: '❌ "Just this once" is still a policy violation with the same risks. If something goes wrong during that session, both you and your lead face consequences.' },
+        { text: 'Decline, escalate the access request as urgent, and explain why credential sharing is prohibited.', correct: true, feedback: '✅ Correct! The right answer is to push the process, not bypass it. Flag it as an urgent request to IT and document that you declined to use shared credentials. This protects you and the organization.' },
+        { text: 'Report your team lead to security for suggesting this.', correct: false, feedback: '⚠️ Reporting first without first declining and explaining the issue is an overreaction for a well-intentioned (if misguided) suggestion. Decline and educate first. If they persist, then escalate.' },
+      ]
+    },
+    {
+      icon: '🌙',
+      title: 'The Unusual Login',
+      description: 'You\'re in the security team and you notice an alert: a mid-level accountant\'s account logged into the company\'s financial reporting system from an IP address in a country where you have no offices, at 3:17 AM, and queried 8,000 records — far outside normal usage. The employee is on annual leave.',
+      options: [
+        { text: 'Wait for the employee to return from leave before taking action.', correct: false, feedback: '❌ A compromised account can exfiltrate massive amounts of data in hours. Waiting days is not an option. Suspend the session and begin investigation immediately.' },
+        { text: 'Disable the account session immediately, preserve logs, and notify the incident response team.', correct: true, feedback: '✅ Correct! This is a classic compromised account indicator (foreign IP, unusual hours, employee on leave, bulk data query). Stop the bleeding first, then investigate. Time matters enormously here.' },
+        { text: 'Send the employee an email asking if they authorized this access.', correct: false, feedback: '❌ If the account is compromised, the attacker may have access to the email too. Don\'t tip them off. Take action first — disable the session, then contact the employee through a verified out-of-band channel (phone call).' },
+        { text: 'Monitor the account for 24 more hours to gather more evidence.', correct: false, feedback: '❌ More monitoring during an active incident means more data loss. The evidence you already have is sufficient to act. Contain first, investigate second.' },
+      ]
+    },
+  ];
+
+  function buildScenarios() {
+    const container = document.getElementById('scenarioContainer');
+    if (container.innerHTML.trim()) return;
+    scenarioCorrect = 0;
+    scenarioAnswered = 0;
+
+    scenarios.forEach((s, idx) => {
+      const card = document.createElement('div');
+      card.className = 'scenario-card';
+      card.innerHTML = `
+        <div class="scenario-header">
+          <div class="scenario-icon">${s.icon}</div>
+          <div><h3>Scenario ${idx+1}: ${s.title}</h3></div>
+        </div>
+        <p class="scenario-desc">${s.description}</p>
+        <div class="scenario-options" id="scen${idx}Opts">
+          ${s.options.map((o,oi) =>
+            `<button onclick="scenarioAnswer(${idx},${oi})">${o.text}</button>`
+          ).join('')}
+        </div>
+        <div class="feedback" id="scen${idx}Fb"></div>
+      `;
+      container.appendChild(card);
+    });
+  }
+
+  function scenarioAnswer(sIdx, oIdx) {
+    const optsEl = document.getElementById('scen' + sIdx + 'Opts');
+    if (optsEl.dataset.answered) return;
+    optsEl.dataset.answered = 'true';
+    const opt = scenarios[sIdx].options[oIdx];
+    const fbEl = document.getElementById('scen' + sIdx + 'Fb');
+
+    optsEl.querySelectorAll('button').forEach((btn, i) => {
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      if (scenarios[sIdx].options[i].correct) {
+        btn.className += ' correct';
+        btn.style.opacity = '1';
+      }
+    });
+    if (!opt.correct) {
+      optsEl.querySelectorAll('button')[oIdx].className += ' incorrect';
+      optsEl.querySelectorAll('button')[oIdx].style.opacity = '1';
+    }
+
+    fbEl.className = 'feedback ' + (opt.correct ? 'correct' : (opt.feedback.startsWith('⚠️') ? 'warning' : 'incorrect'));
+    fbEl.style.display = 'block';
+    fbEl.textContent = opt.feedback;
+
+    scenarioAnswered++;
+    if (opt.correct) scenarioCorrect++;
+
+    if (scenarioAnswered === scenarios.length) {
+      const summary = document.getElementById('scenarioSummary');
+      summary.style.display = 'block';
+      document.getElementById('scenarioScore').textContent = `${scenarioCorrect}/${scenarios.length} Correct`;
+      const msg = document.getElementById('scenarioMsg');
+      if (scenarioCorrect === scenarios.length) {
+        msg.textContent = '🏆 Perfect! You chose the optimal response to every scenario.';
+        showAchievement('🏆', 'Scenario Expert', 'Perfect score on all situations!');
+        spawnConfetti();
+      } else if (scenarioCorrect >= 2) {
+        msg.textContent = '👏 Good work! Review the explanations on any you missed.';
+        showAchievement('🎯', 'Solid Performance', 'Review the missed scenarios.');
+      } else {
+        msg.textContent = '📚 Review the feedback carefully — these scenarios reflect real decisions.';
+      }
+      document.getElementById('scenarioContinueBtn').style.display = 'inline-flex';
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     SLIDE 7 — KNOWLEDGE QUIZ
+  ══════════════════════════════════════════════ */
+  const quizQuestions = [
+    {
+      q: 'An employee who accidentally emails a client spreadsheet to the wrong external recipient is best classified as:',
+      options: ['A malicious insider', 'A negligent insider', 'A compromised account', 'Not an insider threat at all'],
+      correct: 1,
+      feedback: 'Negligent insiders cause harm through carelessness rather than intent. Accidental data disclosure is one of the most common negligent insider incidents.'
+    },
+    {
+      q: 'You notice a coworker\'s account is querying the customer database at 2 AM from an unknown IP, while the coworker is on a week-long vacation. What does this most likely indicate?',
+      options: [
+        'The employee is working remotely while on vacation',
+        'A system backup process running automatically',
+        'A compromised account being used by an external attacker',
+        'A malicious insider staging data for theft'
+      ],
+      correct: 2,
+      feedback: 'Foreign IP + unusual hours + employee confirmed away = classic compromised account indicator. The account holder\'s access is being misused by someone who has obtained their credentials.'
+    },
+    {
+      q: 'When you observe potential insider threat behavior, you should:',
+      options: [
+        'Confront the coworker directly to give them a chance to explain',
+        'Document what you observed and report it through official channels',
+        'Share your concerns with nearby colleagues to get their opinions',
+        'Wait until you are 100% certain before taking any action'
+      ],
+      correct: 1,
+      feedback: 'Document and report through official channels. Never confront, never gossip, never wait for certainty — that\'s the investigators\' job. Your role is to provide timely, accurate information.'
+    },
+    {
+      q: 'Which of the following is the MOST concerning combination of behaviors from a departing employee?',
+      options: [
+        'Saying goodbye to coworkers and cleaning out their desk',
+        'Accessing files outside their normal job scope and downloading large data volumes in their final week',
+        'Requesting that their access be terminated early',
+        'Documenting their workflows and processes to help with transition'
+      ],
+      correct: 1,
+      feedback: 'Departing employees who suddenly access out-of-scope data and download large volumes are exhibiting classic data theft behavior. The combination — especially near an end date — is a major red flag.'
+    },
+    {
+      q: 'An employee reports a coworker in good faith but the investigation finds no wrongdoing. What should happen to the reporter?',
+      options: [
+        'They should face consequences for wasting the security team\'s time',
+        'Nothing — good faith reports are protected from retaliation under corporate policy',
+        'They should be required to apologize to the coworker',
+        'Their reporting privileges should be revoked'
+      ],
+      correct: 1,
+      feedback: 'Good faith reporters are protected. Retaliation against reporters is itself a serious policy violation and undermines the entire reporting culture. Organizations depend on employees feeling safe to report.'
+    },
+  ];
+
+  function buildQuiz() {
+    const container = document.getElementById('quizContainer');
+    const dots = document.getElementById('quizDots');
+    if (container.innerHTML.trim()) return;
+    quizScore = 0;
+    quizAnswered = 0;
+
+    dots.innerHTML = quizQuestions.map((_,i) => `<div class="q-dot" id="dot${i}"></div>`).join('');
+    dots.querySelector('#dot0').classList.add('active');
+
+    quizQuestions.forEach((q, idx) => {
+      const block = document.createElement('div');
+      block.className = 'quiz-question';
+      block.id = 'q' + idx;
+      block.style.display = idx === 0 ? 'block' : 'none';
+      block.innerHTML = `
+        <h3>Q${idx+1}. ${q.q}</h3>
+        <div class="quiz-options" id="qOpts${idx}">
+          ${q.options.map((o,oi) =>
+            `<button onclick="quizAnswer(${idx},${oi})">${o}</button>`
+          ).join('')}
+        </div>
+        <div class="feedback" id="qFb${idx}"></div>
+        <div style="display:none;margin-top:16px;" id="qNext${idx}">
+          ${idx < quizQuestions.length - 1
+            ? `<button class="btn" onclick="nextQuestion(${idx+1})">Next Question →</button>`
+            : `<button class="btn btn-success" onclick="finishQuiz()">Finish Quiz ✓</button>`}
+        </div>
+      `;
+      container.appendChild(block);
+    });
+  }
+
+  function quizAnswer(qIdx, oIdx) {
+    const optsEl = document.getElementById('qOpts' + qIdx);
+    if (optsEl.dataset.answered) return;
+    optsEl.dataset.answered = 'true';
+    const q = quizQuestions[qIdx];
+    const isCorrect = oIdx === q.correct;
+
+    optsEl.querySelectorAll('button').forEach((btn, i) => {
+      btn.disabled = true;
+      btn.style.opacity = i === q.correct ? '1' : '0.45';
+      if (i === q.correct) btn.className += ' correct';
+    });
+    if (!isCorrect) {
+      optsEl.querySelectorAll('button')[oIdx].className += ' incorrect';
+      optsEl.querySelectorAll('button')[oIdx].style.opacity = '1';
+    }
+
+    const fb = document.getElementById('qFb' + qIdx);
+    fb.className = 'feedback ' + (isCorrect ? 'correct' : 'incorrect');
+    fb.style.display = 'block';
+    fb.textContent = q.feedback;
+
+    if (isCorrect) { quizScore++; }
+    quizAnswered++;
+
+    const dot = document.getElementById('dot' + qIdx);
+    dot.classList.remove('active');
+    dot.classList.add(isCorrect ? 'done-correct' : 'done-incorrect');
+    if (qIdx + 1 < quizQuestions.length) {
+      document.getElementById('dot' + (qIdx+1)).classList.add('active');
+    }
+
+    document.getElementById('qNext' + qIdx).style.display = 'block';
+  }
+
+  function nextQuestion(idx) {
+    document.querySelectorAll('.quiz-question').forEach(q => q.style.display = 'none');
+    document.getElementById('q' + idx).style.display = 'block';
+  }
+
+  function finishQuiz() {
+    const pct = Math.round((quizScore / quizQuestions.length) * 100);
+    document.getElementById('quizContinueBtn').style.display = 'inline-flex';
+    if (pct === 100) {
+      showAchievement('🎓', 'Quiz Master!', `Perfect score: ${quizScore}/${quizQuestions.length}`);
+      spawnConfetti();
+    } else if (pct >= 60) {
+      showAchievement('📚', 'Quiz Complete', `${quizScore}/${quizQuestions.length} correct`);
+    } else {
+      showAchievement('📖', 'Keep Learning', 'Review and try again!');
+    }
+  }
+
+  /* ══════════════════════════════════════════════
+     SLIDE 8 — COMPLETION
+  ══════════════════════════════════════════════ */
+  function buildFinal() {
+    const total = quizScore + judgmentScore + scenarioCorrect;
+    const maxTotal = quizQuestions.length + judgmentScenarios.length + scenarios.length;
+    const pct = Math.round((total / maxTotal) * 100);
+
+    document.getElementById('finalScore').textContent = `${pct}% Overall Score`;
+
+    let badge = '🛡️', msg = '';
+    if (pct === 100) {
+      badge = '🏆';
+      msg = 'Outstanding! Perfect score. You\'re a true insider threat defender.';
+      spawnConfetti();
+    } else if (pct >= 80) {
+      badge = '🥇';
+      msg = 'Excellent work! You have a strong understanding of insider threat awareness.';
+    } else if (pct >= 60) {
+      badge = '🥈';
+      msg = 'Good effort. Review the sections where you missed questions to reinforce your knowledge.';
+    } else {
+      badge = '📚';
+      msg = 'You\'ve completed the module. We recommend reviewing the material and retaking to solidify your understanding.';
+    }
+    document.getElementById('finalBadge').textContent = badge;
+    document.getElementById('finalMsg').textContent = msg;
+  }
+
+  function restartModule() {
+    currentSlide = 1;
+    quizScore = 0; quizAnswered = 0;
+    judgmentScore = 0; judgmentAnswered = 0;
+    scenarioCorrect = 0; scenarioAnswered = 0;
+    currentJudgment = 0;
+
+    document.getElementById('judgmentContainer').innerHTML = '';
+    document.getElementById('scenarioContainer').innerHTML = '';
+    document.getElementById('quizContainer').innerHTML = '';
+    document.getElementById('quizDots').innerHTML = '';
+    document.getElementById('scenarioSummary').style.display = 'none';
+    document.getElementById('scenarioContinueBtn').style.display = 'none';
+    document.getElementById('quizContinueBtn').style.display = 'none';
+    document.getElementById('judgmentNextBtn').style.display = 'none';
+
+    showSlide(1);
+  }
+
+  /* ── INIT ── */
+  showSlide(1);
+</script>
+<script data-portal-tracking-bridge="true">
+(function () {
+  const MODULE_ID = 'insider-threat-awareness';
+  let lastReportedSlide = null;
+  let completionSent = false;
+
+  function getSlides() {
+    return Array.from(document.querySelectorAll('.slide'));
+  }
+
+  function getTotalSlides() {
+    return getSlides().length || 8;
+  }
+
+  function getActiveSlideNumber() {
+    const active = document.querySelector('.slide.active[id^="slide"]');
+    if (active) {
+      const match = active.id.match(/slide(\d+)/i);
+      if (match) {
+        return Number(match[1]) || 1;
+      }
+    }
+
+    return 1;
+  }
+
+  function postToParent(payload) {
+    if (window.parent && window.parent !== window) {
+      window.parent.postMessage(payload, '*');
+    }
+  }
+
+  function reportCompletion() {
+    if (completionSent) {
+      return;
+    }
+
+    completionSent = true;
+    postToParent({ type: 'moduleComplete', module: MODULE_ID });
+  }
+
+  function reportSlideChange() {
+    const slide = getActiveSlideNumber();
+    if (slide !== lastReportedSlide) {
+      lastReportedSlide = slide;
+      postToParent({ type: 'slideChange', slide: slide, module: MODULE_ID });
+    }
+
+    if (slide >= getTotalSlides()) {
+      reportCompletion();
+    }
+  }
+
+  const originalShowSlide = window.showSlide;
+  if (typeof originalShowSlide === 'function') {
+    window.showSlide = function patchedShowSlide() {
+      const result = originalShowSlide.apply(this, arguments);
+      setTimeout(reportSlideChange, 0);
+      return result;
+    };
+  }
+
+  window.addEventListener('message', function (event) {
+    if (!event.data || typeof event.data !== 'object') {
+      return;
+    }
+
+    if (event.data.type === 'restoreState') {
+      const targetSlide = Math.max(Number(event.data.slide) || 1, 1);
+      setTimeout(function () {
+        if (typeof window.showSlide === 'function') {
+          window.showSlide(targetSlide);
+        }
+      }, 30);
+    }
+  });
+
+  const owl = document.querySelector('.grc-owl');
+  if (owl) {
+    owl.addEventListener('click', function () {
+      postToParent({ type: 'goHome' });
+    });
+  }
+
+  setTimeout(reportSlideChange, 80);
+})();
+</script>
+</body>
+</html>

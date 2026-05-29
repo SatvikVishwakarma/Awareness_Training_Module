@@ -122,6 +122,36 @@
       min-height: 54px;
     }
 
+    .module-item-copy {
+      min-width: 0;
+      flex: 1;
+    }
+
+    .module-item-copy strong {
+      display: block;
+      font-size: 14px;
+    }
+
+    .module-item-meta {
+      margin-top: 4px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .module-item-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .button.small {
+      padding: 8px 10px;
+      font-size: 12px;
+      border-radius: 7px;
+    }
+
     .switch {
       display: inline-flex;
       align-items: center;
@@ -217,14 +247,14 @@
           <h2 style="margin:0 0 10px 0;">Module Availability</h2>
           <div id="moduleList" class="modules"></div>
           <div style="margin-top: 14px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-            <h3 style="margin:0 0 8px 0; font-size: 16px;">Register Packaged Module</h3>
+            <h3 style="margin:0 0 8px 0; font-size: 16px;">Upload Training Module</h3>
             <div class="row">
-              <input id="moduleIdInput" class="input" type="text" placeholder="Module ID (example: cloud-security)">
               <input id="moduleTitleInput" class="input" type="text" placeholder="Module Title">
-              <input id="modulePathInput" class="input" type="text" placeholder="Entry Path (example: cloud-security-training/module.html)">
-              <button id="registerModuleButton" class="button" type="button">Register Module</button>
+              <input id="moduleIconInput" class="input" type="text" placeholder="Module Emoji (example: 🕵️)" maxlength="8">
+              <input id="moduleFileInput" class="input" type="file" accept=".html,text/html">
+              <button id="uploadModuleButton" class="button" type="button">Upload Module</button>
             </div>
-            <p class="muted" style="margin:8px 0 0 0;">Admin registers an existing packaged HTML module path. Raw HTML paste/upload is not supported.</p>
+            <p class="muted" style="margin:8px 0 0 0;">Choose an HTML training file, a title, and optionally an emoji. The system stores it, registers it, and makes it available across the portal.</p>
           </div>
         </div>
 
@@ -337,11 +367,19 @@
         const enabled = moduleAvailability[moduleId] !== false;
         return `
           <div class="module-item">
-            <div>${escapeHtml(module.title)}</div>
-            <label class="switch">
-              <input type="checkbox" data-module-id="${moduleId}" ${enabled ? 'checked' : ''}>
-              ${enabled ? 'Enabled' : 'Disabled'}
-            </label>
+            <div class="module-item-copy">
+              <strong>${escapeHtml(module.icon || '📘')} ${escapeHtml(module.title)}</strong>
+              <div class="module-item-meta">${escapeHtml(module.entryPath)}</div>
+            </div>
+            <div class="module-item-actions">
+              <label class="switch">
+                <input type="checkbox" data-module-id="${moduleId}" ${enabled ? 'checked' : ''}>
+                ${enabled ? 'Enabled' : 'Disabled'}
+              </label>
+              <button type="button" class="button danger small" data-delete-module-id="${moduleId}">
+                Delete
+              </button>
+            </div>
           </div>
         `;
       }).join('');
@@ -365,6 +403,27 @@
           }
         });
       });
+
+      list.querySelectorAll('button[data-delete-module-id]').forEach((button) => {
+        button.addEventListener('click', async (event) => {
+          const moduleId = event.currentTarget.getAttribute('data-delete-module-id');
+          const moduleLabel = moduleLabelLookup[moduleId] || moduleId;
+          const confirmed = window.confirm(`Delete module "${moduleLabel}"? This cannot be undone.`);
+          if (!confirmed) {
+            return;
+          }
+
+          try {
+            await adminFetch(`/api/v1/admin/modules/${encodeURIComponent(moduleId)}`, {
+              method: 'DELETE'
+            });
+            await loadSettings();
+            setStatus('appStatus', `Deleted module: ${moduleLabel}`);
+          } catch (error) {
+            setStatus('appStatus', `Error: ${error.message}`);
+          }
+        });
+      });
     }
 
     async function loadSettings() {
@@ -384,37 +443,54 @@
       document.getElementById('lockReason').value = siteLock.reason || '';
     }
 
-    async function registerModule() {
-      const idInput = document.getElementById('moduleIdInput');
+    function readFileAsText(file) {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ''));
+        reader.onerror = () => reject(new Error('Could not read the selected file.'));
+        reader.readAsText(file);
+      });
+    }
+
+    async function uploadModule() {
       const titleInput = document.getElementById('moduleTitleInput');
-      const pathInput = document.getElementById('modulePathInput');
+      const iconInput = document.getElementById('moduleIconInput');
+      const fileInput = document.getElementById('moduleFileInput');
 
-      const id = (idInput.value || '').trim().toLowerCase();
       const title = (titleInput.value || '').trim();
-      const entryPath = (pathInput.value || '').trim();
+      const icon = (iconInput.value || '').trim();
+      const file = fileInput.files && fileInput.files[0];
 
-      if (!id || !title || !entryPath) {
-        setStatus('appStatus', 'Module id, title, and entry path are required.');
+      if (!title || !file) {
+        setStatus('appStatus', 'Module title and HTML file are required.');
         return;
       }
 
-      if (currentModules.some((module) => module.id === id)) {
-        setStatus('appStatus', 'A module with this id already exists.');
+      if (!/\.html?$/i.test(file.name)) {
+        setStatus('appStatus', 'Please choose a valid .html file.');
         return;
       }
 
-      await adminFetch('/api/v1/admin/modules', {
+      setStatus('appStatus', 'Uploading module...');
+      const htmlContent = await readFileAsText(file);
+
+      await adminFetch('/api/v1/admin/modules/upload', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id, title, entryPath })
+        body: JSON.stringify({
+          title,
+          icon,
+          fileName: file.name,
+          htmlContent
+        })
       });
 
-      idInput.value = '';
       titleInput.value = '';
-      pathInput.value = '';
+      iconInput.value = '';
+      fileInput.value = '';
 
       await loadSettings();
-      setStatus('appStatus', `Module registered: ${title}`);
+      setStatus('appStatus', `Module uploaded: ${title}`);
     }
 
     async function loadSubmissions() {
@@ -668,8 +744,8 @@
       });
     });
 
-    document.getElementById('registerModuleButton').addEventListener('click', () => {
-      registerModule().catch((error) => {
+    document.getElementById('uploadModuleButton').addEventListener('click', () => {
+      uploadModule().catch((error) => {
         setStatus('appStatus', `Error: ${error.message}`);
       });
     });
@@ -702,5 +778,3 @@
   </script>
 </body>
 </html>
-
-
