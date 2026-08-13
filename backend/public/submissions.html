@@ -208,6 +208,33 @@
       margin-top: 10px;
     }
 
+    .message-window {
+      width: 100%;
+      min-height: 280px;
+      resize: vertical;
+      font-family: Consolas, 'Courier New', monospace;
+      font-size: 13px;
+      line-height: 1.5;
+      background: #f8fafc;
+      color: #0f172a;
+      white-space: pre-wrap;
+    }
+
+    .lock-help {
+      margin-top: 12px;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 12px;
+    }
+
+    .lock-help h3 {
+      margin: 0 0 8px 0;
+      font-size: 16px;
+    }
+
+    .lock-help p {
+      margin: 0 0 8px 0;
+    }
+
     @media (max-width: 960px) {
       .grid {
         grid-template-columns: 1fr;
@@ -270,6 +297,52 @@
           <textarea id="lockReason" rows="4" placeholder="Training portal is temporarily unavailable."></textarea>
           <div class="row" style="margin-top: 10px;">
             <button id="saveLock" class="button" type="button">Save Lock Settings</button>
+          </div>
+          <div style="margin-top: 14px; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            <h3 style="margin:0 0 8px 0; font-size: 16px;">Change Admin Password</h3>
+            <p class="muted" style="margin:0 0 10px 0;">This updates the stored bcrypt hash that the dashboard uses for future logins.</p>
+            <div class="row">
+              <input id="currentAdminPassword" class="input" type="password" placeholder="Current password" autocomplete="current-password">
+              <input id="newAdminPassword" class="input" type="password" placeholder="New password" autocomplete="new-password">
+              <input id="confirmAdminPassword" class="input" type="password" placeholder="Confirm new password" autocomplete="new-password">
+            </div>
+            <div class="row" style="margin-top: 10px;">
+              <button id="changePasswordButton" class="button secondary" type="button">Update Password</button>
+            </div>
+          </div>
+          <div class="lock-help">
+            <h3>Module postMessage contract</h3>
+            <p class="muted">Use this structure when you add a new iframe module so progress, completion, and state restore events can be tracked consistently.</p>
+            <textarea class="message-window" rows="13" readonly aria-label="Module postMessage contract">All training modules should communicate with the parent portal by calling:
+
+window.parent.postMessage(payload, '*')
+
+Send a plain object. Do not send a string.
+
+Required top-level field:
+- type: identifies the event being sent
+
+Events used by the portal:
+- slideChange: sent when the learner changes slides
+  Example: { type: 'slideChange', module: 'phishing', slide: 3 }
+- choiceUpdate: sent when an interaction stores learner choices
+  Example: { type: 'choiceUpdate', slideId: 'slide-5', choice: 'A' }
+- moduleComplete: sent when the module is finished
+  Example: { type: 'moduleComplete', module: 'phishing', score: 100 }
+- goHome: requests the parent portal to return to the home view
+
+Parent-to-module restore event:
+- restoreState: sent after the iframe loads so a module can resume progress
+  Example: { type: 'restoreState', module: 'phishing', slide: 4, choices: { ... } }
+
+Implementation rules:
+- Keep the module id stable and match the registry id exactly.
+- Always include slide numbers when the module can resume or report progress.
+- Keep choices as a plain JSON object so the parent can persist them safely.
+- If the module completes, send moduleComplete before navigating away.
+- If the parent sends restoreState, apply the slide number and saved choices before rendering the learner UI.
+
+If you add a new module, follow the same event names and payload shape so the portal can track it without custom code.</textarea>
           </div>
         </div>
       </div>
@@ -529,6 +602,52 @@
       setStatus('appStatus', `Portal is now ${locked ? 'LOCKED' : 'UNLOCKED'}.`);
     }
 
+    async function changeAdminPassword() {
+      const currentPassword = (document.getElementById('currentAdminPassword').value || '').trim();
+      const newPassword = (document.getElementById('newAdminPassword').value || '').trim();
+      const confirmPassword = (document.getElementById('confirmAdminPassword').value || '').trim();
+
+      if (!currentPassword || !newPassword || !confirmPassword) {
+        setStatus('appStatus', 'Enter your current password and the new password twice.');
+        return;
+      }
+
+      if (newPassword.length < 8) {
+        setStatus('appStatus', 'New password must be at least 8 characters long.');
+        return;
+      }
+
+      if (newPassword !== confirmPassword) {
+        setStatus('appStatus', 'New password and confirmation do not match.');
+        return;
+      }
+
+      try {
+        const response = await fetch('/api/v1/admin/password', {
+          method: 'PUT',
+          credentials: 'same-origin',
+          headers: {
+            'Content-Type': 'application/json',
+            ...getAuthHeaders()
+          },
+          body: JSON.stringify({ currentPassword, newPassword })
+        });
+
+        const payload = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(payload.error || 'Password update failed');
+        }
+
+        csrfToken = String(payload.csrfToken || csrfToken);
+        document.getElementById('currentAdminPassword').value = '';
+        document.getElementById('newAdminPassword').value = '';
+        document.getElementById('confirmAdminPassword').value = '';
+        setStatus('appStatus', `${payload.message}. Your current session has been rotated.`);
+      } catch (error) {
+        setStatus('appStatus', `Error: ${error.message}`);
+      }
+    }
+
     function setupAutoRefresh() {
       if (autoRefreshInterval) {
         clearInterval(autoRefreshInterval);
@@ -740,6 +859,12 @@
 
     document.getElementById('saveLock').addEventListener('click', () => {
       saveLockSettings().catch((error) => {
+        setStatus('appStatus', `Error: ${error.message}`);
+      });
+    });
+
+    document.getElementById('changePasswordButton').addEventListener('click', () => {
+      changeAdminPassword().catch((error) => {
         setStatus('appStatus', `Error: ${error.message}`);
       });
     });

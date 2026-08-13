@@ -116,6 +116,15 @@ async function setModuleRegistry(moduleRegistry) {
   return moduleRegistry;
 }
 
+async function getAdminPasswordHash(defaultHash) {
+  return getSetting('admin_password_hash', defaultHash);
+}
+
+async function setAdminPasswordHash(passwordHash) {
+  await setSetting('admin_password_hash', passwordHash);
+  return passwordHash;
+}
+
 async function saveEmployeeSubmission({ name, department, email, ipAddress }) {
   const db = await getDb();
   const submittedAt = new Date().toISOString();
@@ -184,5 +193,7 @@ module.exports = {
   getModuleAvailability,
   setModuleAvailability,
   getSiteLock,
-  setSiteLock
+  setSiteLock,
+  getAdminPasswordHash,
+  setAdminPasswordHash
 };

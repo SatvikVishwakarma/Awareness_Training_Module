@@ -16,7 +16,9 @@ const {
   getModuleAvailability,
   setModuleAvailability,
   getSiteLock,
-  setSiteLock
+  setSiteLock,
+  getAdminPasswordHash,
+  setAdminPasswordHash
 } = require('./db');
 
 const app = express();
@@ -92,6 +94,7 @@ const sessionCookieName = 'admin_session';
 const loginWindowMs = Number(process.env.ADMIN_LOGIN_WINDOW_MS || 15 * 60 * 1000);
 const loginMaxAttempts = Number(process.env.ADMIN_LOGIN_MAX_ATTEMPTS || 5);
 const loginLockMs = Number(process.env.ADMIN_LOGIN_LOCK_MS || 15 * 60 * 1000);
+let adminPasswordHash = normalizeString(process.env.ADMIN_PASSWORD_HASH);
 
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
   .split(',')
@@ -156,6 +159,15 @@ app.get('/react', (req, res) => {
 
 function normalizeString(value) {
   return String(value || '').trim();
+}
+
+function getCurrentAdminPasswordHash() {
+  return adminPasswordHash;
+}
+
+function setCurrentAdminPasswordHash(hash) {
+  adminPasswordHash = normalizeString(hash);
+  return adminPasswordHash;
 }
 
 function normalizeModuleId(value) {
@@ -728,29 +740,13 @@ function clearFailedLogin(ip) {
   loginAttempts.delete(ip);
 }
 
-function isPasswordMatch(rawPassword, configuredPassword) {
-  const left = Buffer.from(rawPassword, 'utf8');
-  const right = Buffer.from(configuredPassword, 'utf8');
-  if (left.length !== right.length) {
-    return false;
-  }
-  return crypto.timingSafeEqual(left, right);
-}
-
 async function verifyAdminPassword(password) {
-  const configuredHash = normalizeString(process.env.ADMIN_PASSWORD_HASH);
-  const configuredToken = normalizeString(process.env.ADMIN_TOKEN);
-  const configuredPassword = normalizeString(process.env.ADMIN_PASSWORD || configuredToken);
-
-  if (configuredHash) {
-    return bcrypt.compare(password, configuredHash);
-  }
-
-  if (!configuredPassword) {
+  const configuredHash = getCurrentAdminPasswordHash();
+  if (!configuredHash) {
     return false;
   }
 
-  return isPasswordMatch(password, configuredPassword);
+  return bcrypt.compare(password, configuredHash);
 }
 
 function getSessionToken(req) {
@@ -763,12 +759,10 @@ function getSessionToken(req) {
 }
 
 function requireAdminToken(req, res, next) {
-  const configuredToken = normalizeString(process.env.ADMIN_TOKEN);
-  const configuredPassword = normalizeString(process.env.ADMIN_PASSWORD || configuredToken);
-  const configuredHash = normalizeString(process.env.ADMIN_PASSWORD_HASH);
+  const configuredHash = getCurrentAdminPasswordHash();
 
-  if (!configuredToken && !configuredPassword && !configuredHash) {
-    return next();
+  if (!configuredHash) {
+    return res.status(503).json({ error: 'Admin auth is not configured on server' });
   }
 
   const providedSessionToken = getSessionToken(req);
@@ -784,11 +778,6 @@ function requireAdminToken(req, res, next) {
       req.adminSessionToken = providedSessionToken;
       return next();
     }
-  }
-
-  const providedToken = normalizeString(req.headers['x-admin-token']);
-  if (configuredToken && providedToken === configuredToken) {
-    return next();
   }
 
   return res.status(401).json({ error: 'Unauthorized' });
@@ -848,9 +837,7 @@ app.get('/health', (_req, res) => {
 });
 
 app.post('/api/v1/admin/login', (req, res) => {
-  const configuredToken = normalizeString(process.env.ADMIN_TOKEN);
-  const configuredPassword = normalizeString(process.env.ADMIN_PASSWORD || configuredToken);
-  const configuredHash = normalizeString(process.env.ADMIN_PASSWORD_HASH);
+  const configuredHash = getCurrentAdminPasswordHash();
   const clientIp = getClientIp(req);
   const loginState = getLoginState(clientIp);
 
@@ -860,8 +847,8 @@ app.post('/api/v1/admin/login', (req, res) => {
     return res.status(429).json({ error: 'Too many login attempts. Try again later.' });
   }
 
-  if (!configuredPassword && !configuredHash) {
-    return res.status(503).json({ error: 'Admin password is not configured on server' });
+  if (!configuredHash) {
+    return res.status(503).json({ error: 'Admin password hash is not configured on server' });
   }
 
   const password = normalizeString(req.body?.password);
@@ -907,6 +894,43 @@ app.post('/api/v1/admin/logout', requireAdminToken, requireCsrfToken, (req, res)
   }
   clearSessionCookie(req, res);
   res.status(200).json({ message: 'logged out' });
+});
+
+app.put('/api/v1/admin/password', requireAdminToken, requireCsrfToken, async (req, res) => {
+  const currentPassword = normalizeString(req.body?.currentPassword);
+  const newPassword = normalizeString(req.body?.newPassword);
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ error: 'currentPassword and newPassword are required' });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ error: 'newPassword must be at least 8 characters long' });
+  }
+
+  const matches = await verifyAdminPassword(currentPassword);
+  if (!matches) {
+    return res.status(401).json({ error: 'Current password is incorrect' });
+  }
+
+  try {
+    const nextHash = await bcrypt.hash(newPassword, 10);
+    await setAdminPasswordHash(nextHash);
+    setCurrentAdminPasswordHash(nextHash);
+    adminSessions.clear();
+
+    const session = createAdminSession(req);
+    setSessionCookie(req, res, session.token, session.ttlMs);
+
+    return res.status(200).json({
+      message: 'Admin password updated',
+      csrfToken: session.csrfToken,
+      expiresInMs: session.ttlMs
+    });
+  } catch (error) {
+    console.error('Failed to update admin password:', error);
+    return res.status(500).json({ error: 'Failed to update admin password' });
+  }
 });
 
 app.get('/api/v1/public-state', async (_req, res) => {
@@ -1204,12 +1228,10 @@ app.delete('/api/v1/admin/employee-details', requireAdminToken, requireCsrfToken
     return res.status(400).json({ error: 'Admin password is required' });
   }
 
-  const configuredToken = normalizeString(process.env.ADMIN_TOKEN);
-  const configuredPassword = normalizeString(process.env.ADMIN_PASSWORD || configuredToken);
-  const configuredHash = normalizeString(process.env.ADMIN_PASSWORD_HASH);
+  const configuredHash = getCurrentAdminPasswordHash();
 
-  if (!configuredPassword && !configuredHash) {
-    return res.status(503).json({ error: 'Admin password is not configured on server' });
+  if (!configuredHash) {
+    return res.status(503).json({ error: 'Admin password hash is not configured on server' });
   }
 
   const passwordMatches = await verifyAdminPassword(password);
@@ -1230,7 +1252,10 @@ app.delete('/api/v1/admin/employee-details', requireAdminToken, requireCsrfToken
 });
 
 ensureSchema()
-  .then(() => {
+  .then(async () => {
+    const storedHash = await getAdminPasswordHash(adminPasswordHash);
+    setCurrentAdminPasswordHash(storedHash || adminPasswordHash);
+
     app.listen(port, () => {
       console.log(`Employee capture API listening on port ${port}`);
     });

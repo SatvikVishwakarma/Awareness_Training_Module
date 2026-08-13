@@ -225,9 +225,7 @@ Current `backend/.env` supports these values:
 | `PORT` | Backend port. Defaults to `3001`. |
 | `SQLITE_PATH` | SQLite file path. Defaults to `./data/employee_details.db`. |
 | `ALLOWED_ORIGINS` | Optional comma-separated CORS allowlist. Empty means permissive CORS. |
-| `ADMIN_TOKEN` | Optional token-based admin access fallback. |
-| `ADMIN_PASSWORD` | Admin dashboard password. |
-| `ADMIN_PASSWORD_HASH` | Optional bcrypt hash for the admin password. Supported by code even though it is not present in the checked-in `.env`. |
+| `ADMIN_PASSWORD_HASH` | Required bcrypt hash for the admin dashboard password. Use this instead of storing a plaintext password. The dashboard can later update the stored hash in SQLite. |
 | `ADMIN_SESSION_TTL_MS` | Admin session lifetime. Defaults to 8 hours. |
 | `ADMIN_LOGIN_WINDOW_MS` | Login attempt tracking window. Defaults to 15 minutes. |
 | `ADMIN_LOGIN_MAX_ATTEMPTS` | Max failed attempts before temporary lockout. Defaults to 5. |
@@ -235,8 +233,16 @@ Current `backend/.env` supports these values:
 
 Important:
 
-- The checked-in `backend/.env` currently contains `ADMIN_PASSWORD=Admin@123`.
-- Change that before using this outside local development.
+- The checked-in `backend/.env` now stores a bcrypt hash instead of a plaintext password.
+- If you change the admin password, generate a fresh bcrypt hash and replace `ADMIN_PASSWORD_HASH`.
+- You can also change the admin password from the admin dashboard. That writes a new bcrypt hash into the SQLite settings store and rotates the active admin session.
+
+Generate a new hash with:
+
+```powershell
+cd backend
+node -e "const bcrypt=require('bcryptjs'); console.log(bcrypt.hashSync('your-new-password', 10));"
+```
 
 ## Admin dashboard
 
